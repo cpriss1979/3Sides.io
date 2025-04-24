@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Wellness Plan</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="container">
+    
+      <h2 style="font-size: 1.7rem; color: #b04bb3;
+;">
+      How I behave, think, and feel: My Personal Daily Maintenance Plan...</h2>
+      <h3>Daily Maintenance</h3>
+
+      <form id="wellnessForm">
+        <label>
+          My baseline: What I look like when I’m feeling like myself:
+          <textarea id="wellnessLook" placeholder="Describe how you feel and act when you're well..."></textarea>
+        </label>
+
+        <label>
+          Daily habits that keep me well:
+          <textarea id="dailyHabits" placeholder="Things I need to do everyday to stay well: like meds, sleep, meals, check-ins..."></textarea>
+        </label>
+
+        <h3>Triggers</h3>
+        <label>
+          Things that tend to trigger me:
+          <textarea id="triggerList" placeholder="Stress, lack of sleep, conflict, loud environments, etc."></textarea>
+        </label>
+
+        <label>
+          What I can do when I'm triggered:
+          <textarea id="afterTriggered" placeholder="Steps that help me feel safe and in control..."></textarea>
+        </label>
+
+        <h3>Early Warning Signs</h3>
+        <label>
+          Signs of changes in my typical mood/behavior:
+          <textarea id="warningSigns" placeholder="Examples: nervousness, not sleeping..."></textarea>
+        </label>
+
+        <h3>Action Plan</h3>
+        <label>
+          Once I identify my warning signs:
+          <textarea id="actionPlan" placeholder="What actions can I take to improve my mood/behavior?"></textarea>
+        </label>
+
+        <label>
+          When I need someone else to help/step in, I may need them to:
+          <textarea id="anotherAction" placeholder="Remind me to take meds, take care of pets, etc."></textarea>
+        </label>
+
+        <div class="button-row">
+          <button type="button" onclick="savePlan()">💾 Save Plan</button>
+          <button type="button" onclick="resetPlan()">🗑️ Reset Plan</button>
+          <button type="button" onclick="printPlan()">🖨️ Print Plan</button>
+        </div>
+        
+      </form>
+
+      <div id="savedPlan" class="saved-section">
+        <h2>Saved Plan:</h2>
+        <h3>Daily Maintenance</h3>
+        <p><strong>My baseline: What I look like when I’m feeling like myself:</strong> <span id="displayWellnessLook"></span></p>
+        <p><strong>Daily habits that keep me well:</strong> <span id="displayDailyHabits"></span></p>
+
+        <h3>Triggers</h3>
+        <p><strong>Things that tend to trigger me:</strong> <span id="displayTriggerList"></span></p>
+        <p><strong>What I can do when I'm triggered:</strong> <span id="displayAfterTriggered"></span></p>
+
+        <h3>Early Warning Signs</h3>
+        <p><strong>Signs of changes in my typical mood/behavior:</strong> <span id="displayWarningSigns"></span></p>
+
+        <h3>Action Plan</h3>
+        <p><strong>Once I identify my warning signs:</strong> <span id="displayActionPlan"></span></p>
+        <p><strong>When I need someone else to help/step in, I may need them to:</strong> <span id="displayAnotherAction"></span></p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bottom-nav">
+    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
+    <a href="toolkit.html" class="nav-icon">🧰<span>Toolkit</span></a>
+    <a href="wellnessPlan.html" class="nav-icon">✨<span>Plan</span></a>
+    <a href="journal.html" class="nav-icon">📓<span>Journal</span></a>
+    <a href="support.html" class="nav-icon">🫂<span>Support</span></a>
+    <a href="important-numbers.html" class="nav-icon">🆘<span>Quick Help</span></a>
+  </footer>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
