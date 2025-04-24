@@ -2,41 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Wellness Plan</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to 3-Sides Planner</title>
+  <link rel="stylesheet" href="style.css"/>
+  
 </head>
 <body>
-  <div class="container">
-    <h1>Daily Maintenance Plan</h1>
-    
-    <form id="wellnessForm">
-      <label>
-        What I look like when I’m well:
-        <textarea id="wellnessLook" placeholder="Describe how you feel and act when you're well..."></textarea>
-      </label>
+  
+  <div class="page-wrapper">
+    <div class="container">
+      <h1 class="three-d-title">🎭 3-Sides Planner</h1>
 
-      <label>
-        Daily habits that keep me well:
-        <textarea id="dailyHabits" placeholder="Write about your helpful habits..."></textarea>
-      </label>
+      <div class="cloud-section">
+        <p style="font-size: 1.15rem; color: rgb(29, 29, 159); font-family: Georgia, 'Times New Roman', Times, serif;"">
+          What does <strong>3-Sides</strong> stand for? It represents the three core emotional states many of us with bipolar disorder experience: <strong>Mania</strong>, <strong>Depression</strong>, and a <strong>Stable</strong> mood in between. Living with bipolar often feels like being pulled in different directions—like you're either flying high with racing thoughts and energy, or weighed down by overwhelming sadness and exhaustion. And sometimes, when you're finally in a stable space, it can feel just as unfamiliar. This planner isn’t just about managing symptoms—it’s about helping you <em>understand</em> and <em>track</em> all three sides of your experience with compassion and clarity. By reflecting daily and recognizing patterns, you can feel more in control, more prepared, and more supported—wherever your mind takes you.
+        </p>
+      </div>
 
-      <label>
-        Things I need to do regularly:
-        <textarea id="routineTasks" placeholder="Like meds, sleep, meals, check-ins..."></textarea>
-      </label>
+      <h1 style="font-size: 1.5rem; color: rgb(188, 71, 96);">
+        When we or someone we love is living with bipolar disorder, it’s important to pause and ask: <em>What is bipolar?</em>
+      </h1>
+      
 
-      <button type="button" onclick="savePlan()">💾 Save Plan</button>
-    </form>
+      <h3 style="font-size: 1.5rem; color: rgb(29, 29, 159);">🌿 Stability</h3>
+      <p>
+        Stability is the sweet spot — when your mood is balanced, your thoughts are clear, and you feel grounded. You’re able to enjoy your life, stick to routines, manage stress, and connect with people in a steady way. Stability isn’t about being perfect — it’s about feeling more like yourself. It’s the calm in the middle of the storm, the feeling that you can breathe fully again without fear of the next swing. 
+        <br><br>
+        During stable periods, you may find it easier to build healthy habits, follow through on plans, and reflect on past episodes with more clarity. This is a powerful time for self-awareness and growth. It’s also when your support tools — like this app — can be fine-tuned to prepare for future highs or lows. 
+        <br><br>
+        The goal of this app is to help you stay in this place as much as possible, and return here gently and safely when you’re not. Stability deserves celebration — not because it means everything is perfect, but because it means you’re at peace, moving forward one steady step at a time.
+      </p>
 
-    <div id="savedPlan" class="saved-section">
-      <h2>Saved Plan:</h2>
-      <p><strong>When I’m well:</strong> <span id="displayWellnessLook"></span></p>
-      <p><strong>Daily habits:</strong> <span id="displayDailyHabits"></span></p>
-      <p><strong>Routine tasks:</strong> <span id="displayRoutineTasks"></span></p>
+      <h3 style="font-size: 1.5rem; color: rgb(29, 29, 159);">🌞 Mania</h3>
+      <p>
+        Mania can feel like a superpower. You might feel unstoppable — bursting with energy, creativity, confidence, and big ideas that seem to flow faster than you can keep up with. At first, it might feel exciting, even euphoric. You may find yourself starting new projects, talking a mile a minute, making bold plans, or feeling like everything is finally falling into place. But mania isn’t just about feeling good — it can also come with serious risks. You might sleep very little and still feel wired, take impulsive actions like overspending, driving too fast, hypersexuality, or starting risky relationships. You might feel unusually irritable or defensive when others question you, or like you're on a mission and no one can slow you down. 
+        <br><br>
+        The thing about mania is that it often sneaks in quietly, feeling helpful or powerful at first, which is why it’s so important to learn your early signs and triggers. Recognizing those signs — even the subtle ones — can help you act before things spiral. This planner can be a tool for spotting patterns, staying grounded, and reaching out for support when needed. You deserve stability, and having a plan in place is a powerful act of self-love and protection.
+      </p>
+
+      <h3 style="font-size: 1.5rem; color: rgb(29, 29, 159);">🌤️ Hypomania</h3>
+      <p>
+        Hypomania is like mania’s quieter cousin. It can feel like a burst of sunshine after a long storm — your mind feels sharp, your energy is up, and you might feel more social, creative, or productive than usual. Unlike full mania, hypomania doesn’t typically cause major disruptions in your life — you may still be going to work or keeping up with your responsibilities. In fact, it can feel really good. But it’s also easy to miss or dismiss, especially because it can feel like “just having a good day.” The challenge is that hypomania can escalate into full-blown mania or crash into depression if not recognized early. Tracking your sleep, energy, and behavior during these times can help you catch it before it tips too far. Knowing your early signs gives you the power to pause, reflect, and protect your stability before things spiral.
+      </p>
+
+      <h3 style="font-size: 1.5rem; color: rgb(29, 29, 159);">🌧️ Depression</h3>
+      <p>
+        Bipolar depression is more than just feeling sad — it's like a fog that settles over everything. It’s a deep, persistent heaviness that can make even the simplest tasks feel overwhelming. You might feel numb, hopeless, or weighed down by sadness. It can show up as a lack of energy, loss of interest in things you used to enjoy, or feeling disconnected from the people around you. Even things like eating, showering, or getting out of bed might feel too difficult. 
+        <br><br>
+        Depression can also come with negative thoughts that lie to you — telling you you're a burden, that you're not enough, or that things will never get better. These thoughts are part of the illness, not the truth. Guilt and shame often tag along, especially if you’ve been in a productive or "high" state before and now feel like you’ve crashed.
+        <br><br>
+        It’s important to remember: depression is not your fault. It doesn’t mean you’re weak or lazy — it means your brain is going through something heavy. Recognizing your early warning signs, having a safety plan, and checking in with your support system can make a huge difference. Even if you can’t see it right now, you are not alone, and this low will not last forever. This planner is here to help you document your patterns, reflect gently, and remind yourself that healing is possible, one step at a time.
+      </p>
+
+      <h3 style="font-size: 1.5rem; color: rgb(29, 29, 159);">😵‍💫 Mixed Episodes</h3>
+      <p>
+        Mixed states are when symptoms of mania and depression show up at the same time. You might feel extremely agitated or restless, but also hopeless and low. You could be full of energy but filled with despair — crying while your mind is racing. These episodes are often the most dangerous because you may feel impulsive and hopeless at once, which can lead to risky choices or thoughts of self-harm. They’re hard to recognize and even harder to explain. This app can help you track overlapping feelings, so you’re more equipped to spot when you’re not “just anxious” or “just sad” — you’re in a mixed state, and you deserve support.
+      </p>
+
+      <h3 style="font-size: 1.5rem; color: rgb(29, 29, 159);">🌪️ Rapid Cycling</h3>
+      <p>
+        Rapid cycling is when mood episodes — like mania, hypomania, or depression — happen more often than usual. Instead of lasting for weeks or months, these shifts can happen in just days or even hours. You might feel like you're constantly flipping between emotional states, never getting a break to catch your breath. This can feel exhausting, confusing, and hard to explain to others.
+        <br><br>
+        If you've ever felt like your mood changes “too fast” to be taken seriously, know that you are not imagining it. Rapid cycling is real, and it's more common in some people with bipolar than others. It doesn’t make your experience less valid — it just means your emotional shifts happen more quickly. Tracking your moods, patterns, and triggers in this app can help you notice those shifts sooner and feel more prepared. You're not broken — your brain is just moving through cycles at a different rhythm.
+      </p>
     </div>
+      
+      <footer class="bottom-nav">
+        <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
+        <a href="toolkit.html" class="nav-icon">🧰<span>Toolkit</span></a>
+        <a href="wellnessPlan.html" class="nav-icon">✨<span>Plan</span></a>
+        <a href="journal.html" class="nav-icon">📓<span>Journal</span></a>
+        <a href="support.html" class="nav-icon">🫂<span>Support</span></a>
+        <a href="important-numbers.html" class="nav-icon">🆘<span>Quick Help</span></a>
+      </footer>
   </div>
-
-  <script src="script.js"></script>
 </body>
 </html>
