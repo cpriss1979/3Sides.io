@@ -341,3 +341,32 @@ button:hover, .toolkit-entry button:hover {
   margin: 2rem auto;
   width: 80%;
 }
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin: 2rem auto;
+  max-width: 1000px;
+  justify-content: center;
+  text-align: left;
+  background: #fefefe;
+  border-radius: 2rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+
+.info-image {
+  width: 150px;
+  height: auto;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.info-text {
+  max-width: 600px;
+  padding: 1rem;
+  flex: 1; /* helps it grow to share space next to the image */
+}
