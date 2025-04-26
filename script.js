@@ -194,8 +194,79 @@ function printPlan() {
   };
 }
 
-// Run both display functions when the page loads
+// --------------------- AFFIRMATIONS ---------------------
+
+// 🎵 Create and preload the audio element
+const dingSound = new Audio("chime.mp3");
+dingSound.preload = "auto";
+
+let soundEnabled = false; // 🌟 New! Only play sound after user interacts
+
+// 🌟 Array of affirmations
+const affirmations = [
+  "You are not your diagnosis. You are not a stereotype.",
+  "You have been through worse days, and you can get through this day too.",
+  "Your feelings are valid. Be assertive.",
+  "Everyday you come closer to reaching your goals.",
+  "Being bipolar means my days will never be the same. But that's good because that means you will never stay down.",
+  "Sometimes you have to take life 1 second at a time. You've got this.",
+  "How do you eat an elephant 🐘? One bite at a time.",
+  "You are never 'always' angry/sad/mad/happy. You will bounce back.",
+  "You are never alone.",
+  "Sometimes you just need to rest and that's ok.",
+  "You accomplish much on a tough day, by waking up and facing the day.",
+  "You surround yourself with others that love you.",
+  "You are strong, smart, kind, and worthy to be loved.",
+  "It's not how you start the race... it's how you finish it.",
+  "Sometimes we all need a little help. It's ok to ask.",
+  "God loves ❤️ you!",
+  "God created you, and God doesn't make mistakes.",
+  "Never let fear win. Don't give up. Try/try again.",
+  "You might be nothing to everyone, but to someone you're everything.",
+  "Everyone has good and bad days, everyone.",
+  "God will protect you.",
+  "God will guide you.",
+  "Jesus loves the little children, all the children of the world 🌎.",
+  "Someone loves 💖you.",
+  "Even if you feel alone, your not. ✞ God is always there.",
+  "You have a beautiful heart 💙.",
+  "You wont make as many mistakes if you don't try, but you will never succeed if you don't try.",
+  "God has plans for you, in this world.",
+  "Your smile brightens the world.",
+  "I forgive me, I forgive myself of my mistakes and bad choices."
+];
+
+// 🌈 Function to show a random affirmation
+function showAffirmation() {
+  const randomIndex = Math.floor(Math.random() * affirmations.length);
+  const message = affirmations[randomIndex];
+
+  // 🔔 Play the ding sound immediately
+  dingSound.currentTime = 0;
+  dingSound.play();
+
+  // Create a pop-up styled box
+  const popup = document.createElement("div");
+  popup.className = "affirmation-popup";
+  popup.textContent = message;
+  document.body.appendChild(popup);
+
+  // Fade out after a few seconds
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    setTimeout(() => popup.remove(), 1000);
+  }, 4000);
+}
+
+// --------------------- ON PAGE LOAD ---------------------
+
 window.onload = function () {
-  displaySupport();
-  displaySavedPlan();
+  if (document.getElementById('savedSupportList')) {
+    displaySupport();
+  }
+  if (document.getElementById('displayWellnessLook')) {
+    displaySavedPlan();
+  }
+  showAffirmation();
 };
+
