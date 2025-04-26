@@ -370,3 +370,22 @@ button:hover, .toolkit-entry button:hover {
   padding: 1rem;
   flex: 1; /* helps it grow to share space next to the image */
 }
+
+/* 🌸 Affirmation popup styling */
+.affirmation-popup {
+  position: fixed;
+  top: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #6a1b9a;
+  padding: 2rem 4rem;
+  border-radius: 2rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.2rem;
+  text-align: center;
+  z-index: 2000;
+  transition: opacity 1s ease;
+}
+
