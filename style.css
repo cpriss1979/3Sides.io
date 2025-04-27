@@ -29,16 +29,12 @@ html, body {
   padding: 2rem;
   border-radius: 2rem;
   border: 3px solid #6f4876;  
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   margin: 2rem auto;
   width: 100%;
   max-width: 850px;
   box-sizing: border-box;
-  flex-grow: 1; /* 🌟 ADD THIS LINE! */
-  display: flex; /* 🌟 ADD THIS TOO */
-  flex-direction: column; /* 🌟 Keep your content stacking downward */
 }
-
 
 /* Heading styles */
 h1, h2, h3 {
@@ -309,9 +305,9 @@ button:hover, .toolkit-entry button:hover {
 .bubble-box {
   background: #f3e5f5;  /* soft lavender pink */
   border: 3px dotted #6f4876;  
-  border-radius: 15rem;
-  padding: 2rem;
-  margin: 3rem auto;
+  border-radius: .5rem;
+  padding: 1rem;
+  margin: 1rem auto;
   max-width: 800px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.05);
   text-align: center;
