@@ -200,7 +200,7 @@ function printPlan() {
 const dingSound = new Audio("chime.mp3");
 dingSound.preload = "auto";
 
-let soundEnabled = false; // 🌟 New! Only play sound after user interacts
+let soundEnabled = false; // 🌟 Only play sound after user interacts
 
 // 🌟 Array of affirmations
 const affirmations = [
@@ -241,9 +241,12 @@ function showAffirmation() {
   const randomIndex = Math.floor(Math.random() * affirmations.length);
   const message = affirmations[randomIndex];
 
-  // 🔔 Play the ding sound immediately
-  dingSound.currentTime = 0;
-  dingSound.play();
+  if (soundEnabled) {
+    dingSound.currentTime = 0;
+    dingSound.play().catch((e) => {
+      console.log("Sound couldn't play yet: ", e);
+    });
+  }
 
   // Create a pop-up styled box
   const popup = document.createElement("div");
@@ -258,8 +261,17 @@ function showAffirmation() {
   }, 4000);
 }
 
-// --------------------- ON PAGE LOAD ---------------------
+// 🛎️ Enable sound after first interaction
+function enableSound() {
+  soundEnabled = true;
+  document.removeEventListener('click', enableSound);
+  document.removeEventListener('touchstart', enableSound);
 
+  // 🩷 Show the affirmation AFTER enabling sound
+  showAffirmation();
+}
+
+// --------------------- ON PAGE LOAD ---------------------
 window.onload = function () {
   if (document.getElementById('savedSupportList')) {
     displaySupport();
@@ -267,6 +279,9 @@ window.onload = function () {
   if (document.getElementById('displayWellnessLook')) {
     displaySavedPlan();
   }
-  showAffirmation();
+
+  // Wait for user to interact first
+  document.addEventListener('click', enableSound, { once: true });
+  document.addEventListener('touchstart', enableSound, { once: true });
 };
 
