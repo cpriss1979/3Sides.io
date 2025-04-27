@@ -374,7 +374,7 @@ button:hover, .toolkit-entry button:hover {
 /* 🌸 Affirmation popup styling */
 .affirmation-popup {
   position: fixed;
-  top: 250px;
+  top: 150px;
   left: 50%;
   transform: translateX(-50%);
   background: #ffffff;
