@@ -3,69 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Feel-Good Toolkit</title>
   <link rel="stylesheet" href="style.css"/>
+  <title>Support People</title>
 </head>
 <body>
-  <div class="page-wrapper">
-    <div class="container">
-      <h1> ✦ My Feel-Good Toolkit ✧</h1>
+  <div class="container">
+    <h1>💞 My Support</h1>
+    <p style="text-align: center;">These are the people I trust and can reach out to when I need help, comfort, or grounding.</p>
 
-      <div class="feel-good-container">
-        <button class="dropdown-btn" onclick="toggleFeelGood()">💖 Show Feel-Good Ideas</button>
-        <div id="feelGoodList" class="feel-good-content">
-          <table class="feel-good-chart">
-            <tbody>
-              <tr><td>Taking a walk outside</td></tr>
-              <tr><td>Listening to music</td></tr>
-              <tr><td>A hot cup of cocoa in your favorite mug</td></tr>
-              <tr><td>Talk to a friend</td></tr>
-              <tr><td>Journal your thoughts</td></tr>
-              <tr><td>Cuddle with a soft stuffed animal</td></tr>
-              <tr><td>Watch a comforting movie or show</td></tr>
-              <tr><td>Take a bubble bath</td></tr>
-              <tr><td>Light a scented candle</td></tr>
-              <tr><td>Do deep breathing exercises</td></tr>
-              <tr><td>Stretch your body</td></tr>
-              <tr><td>Color in an adult coloring book</td></tr>
-              <tr><td>Read a favorite book</td></tr>
-              <tr><td>Make a gratitude list</td></tr>
-              <tr><td>Drink a glass of cold water</td></tr>
-              <tr><td>Put on comfy clothes or pajamas</td></tr>
-              <tr><td>Dance around your room</td></tr>
-              <tr><td>Look at old happy photos</td></tr>
-              <tr><td>Make a playlist of feel-good songs</td></tr>
-              <tr><td>Use a fidget toy or stress ball</td></tr>
-              <tr><td>Step outside and feel the sun</td></tr>
-              <tr><td>Write a letter to your future self</td></tr>
-              <tr><td>Do a skincare routine</td></tr>
-              <tr><td>Pet an animal (even a neighbor’s dog!)</td></tr>
-              <tr><td>Listen to a positive podcast</td></tr>
-              <tr><td>Do a small craft or creative project</td></tr>
-              <tr><td>Watch funny videos or memes</td></tr>
-              <tr><td>Organize a tiny space (like a drawer)</td></tr>
-              <tr><td>Open a window and breathe deeply</td></tr>
-              <tr><td>Wrap yourself in a weighted blanket</td></tr>
-              <tr><td>Say affirmations out loud</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <p style="text-align: center; font-size: 1.1rem; margin-bottom: 1rem;">
-        💕 Your own comforting, grounding, or joyful ideas. 💕
-      </p>
+    <input type="text" id="name" placeholder="Name" />
+    <input type="text" id="relationship" placeholder="Relationship" />
+    <input type="text" id="phone" placeholder="Phone #" />
 
-      <div class="toolkit-entry">
-        <input type="text" id="newIdea" placeholder="Add your own feel-good idea..." />
-        <button onclick="addIdea()">➕ Add</button>
-      </div>
+    <div class="button-row">
+      <button id="saveSupportButton">💾 Save Support Person</button>
+      <button id="printSupportButton">🖨️ Print Support List</button>
+    </div>
 
-      <div class="notebook-section">
-        <div id="toolkitList"></div>
-      
-       
-      </div>
+    <div class="saved-section">
+      <h2>📋 My Saved Support List</h2>
+      <ul id="savedSupportList"></ul>
     </div>
   </div>
 
@@ -78,55 +35,75 @@
     <a href="important-numbers.html" class="nav-icon">🆘<span>Quick Help</span></a>
   </footer>
 
+  <!-- 🛠 Load external main JavaScript first -->
+  <script src="script.js"></script>
+
+  <!-- 🛠 Page-specific small script -->
   <script>
-    let toolkit = JSON.parse(localStorage.getItem("feelGoodToolkit")) || [];
+    function saveSupport() {
+      const name = document.getElementById("name").value.trim();
+      const relationship = document.getElementById("relationship").value.trim();
+      const phone = document.getElementById("phone").value.trim();
 
-    function renderToolkit() {
-      const listDiv = document.getElementById("toolkitList");
-      listDiv.innerHTML = "";
+      if (!name && !relationship && !phone) return;
 
-      const ul = document.createElement("ul");
-      ul.classList.add("toolkit-list");
-      listDiv.appendChild(ul);
+      const supportList = JSON.parse(localStorage.getItem("supportPeople")) || [];
+      supportList.push({ name, relationship, phone });
+      localStorage.setItem("supportPeople", JSON.stringify(supportList));
 
-      toolkit.forEach((idea, index) => {
+      document.getElementById("name").value = "";
+      document.getElementById("relationship").value = "";
+      document.getElementById("phone").value = "";
+
+      displaySupport();
+    }
+
+    function deleteSupport(index) {
+      const supportList = JSON.parse(localStorage.getItem("supportPeople")) || [];
+      supportList.splice(index, 1);
+      localStorage.setItem("supportPeople", JSON.stringify(supportList));
+      displaySupport();
+    }
+
+    function displaySupport() {
+      const list = JSON.parse(localStorage.getItem("supportPeople")) || [];
+      const ul = document.getElementById("savedSupportList");
+      ul.innerHTML = "";
+
+      list.forEach((person, index) => {
         const li = document.createElement("li");
-        li.classList.add("toolkit-item");
+        li.className = "support-item";
 
-        li.innerHTML = `
-  <span>${idea}</span>
-  <button onclick="deleteIdea(${index})" class="delete-button">❌</button>
-`;
+        const span = document.createElement("span");
+        span.textContent = `${person.name} (${person.relationship}) ${person.phone}`;
 
+        const button = document.createElement("button");
+        button.textContent = "❌";
+        button.className = "delete-button";
+        button.onclick = () => deleteSupport(index);
 
+        li.appendChild(span);
+        li.appendChild(button);
         ul.appendChild(li);
       });
     }
 
-    function addIdea() {
-      const newIdeaInput = document.getElementById("newIdea");
-      const newIdea = newIdeaInput.value.trim();
-      if (newIdea !== "") {
-        toolkit.push(newIdea);
-        localStorage.setItem("feelGoodToolkit", JSON.stringify(toolkit));
-        newIdeaInput.value = "";
-        renderToolkit();
-      }
+    function printSupportList() {
+      window.print();
     }
 
-    function deleteIdea(index) {
-      toolkit.splice(index, 1);
-      localStorage.setItem("feelGoodToolkit", JSON.stringify(toolkit));
-      renderToolkit();
-    }
+    // 🌟 COMBINE everything into ONE window.onload
+    window.onload = function() {
+      // Display support list
+      displaySupport();
+      document.getElementById("saveSupportButton").onclick = saveSupport;
+      document.getElementById("printSupportButton").onclick = printSupportList;
 
-    window.onload = renderToolkit;
-
-    function toggleFeelGood() {
-  const list = document.getElementById("feelGoodList");
-  list.style.display = list.style.display === "none" || list.style.display === "" ? "block" : "none";
-}
-
+      // Setup affirmation trigger after first click
+      document.addEventListener('click', enableSound, { once: true });
+      document.addEventListener('touchstart', enableSound, { once: true });
+    };
   </script>
+
 </body>
 </html>
