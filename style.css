@@ -387,8 +387,8 @@ button:hover, .toolkit-entry button:hover {
   text-align: center;
   z-index: 2000;
   transition: opacity 1s ease;
-  width: 70%; /* 🩷 Add this line! Adjust 80% smaller or bigger */
-  max-width: 600px; /* 🩷 Optional: limit how HUGE it gets */
+  width: 60%; /* 🩷 Add this line! Adjust 80% smaller or bigger */
+  max-width: 500px; /* 🩷 Optional: limit how HUGE it gets */
 }
 
 
