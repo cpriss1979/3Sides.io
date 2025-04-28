@@ -204,24 +204,24 @@ let soundEnabled = false; // 🌟 Only play sound after user interacts
 
 // 🌟 Array of affirmations
 const affirmations = [
-  "You are not your diagnosis. You are not a stereotype.",
-  "You have been through worse days, and you can get through this day too.",
+  "You are n🚫t your diagnosis. You are n🚫t a stereotype.",
+  "You've been through worse ⛈️ days, you can get through this day too 🤗.",
   "Your feelings are valid. Be assertive.",
-  "Everyday you come closer to reaching your goals.",
-  "Being bipolar means my days will never be the same. But that's good because that means you will never stay down.",
-  "Sometimes you have to take life 1 second at a time. You've got this.",
+  "Everyday you come closer 🎯 to reaching your goals.",
+  "Your days will never be the same. You will never stay down ☀️.",
+  "Sometimes you have to take life 1 second ⏱️ at a time. You've got this.",
   "How do you eat an elephant 🐘? One bite at a time.",
-  "You are never 'always' angry/sad/mad/happy. You will bounce back.",
-  "You are never alone.",
-  "Sometimes you just need to rest and that's ok.",
+  "You are never 'always' angry/sad/mad/happy! You will bounce back.",
+  "You are never alone ✝.",
+  "Sometimes you just need to rest ❤️‍🩹 and that's ok .",
   "You accomplish much on a tough day, by waking up and facing the day.",
-  "You surround yourself with others that love you.",
+  "You surround yourself with others that love ❤️ you.",
   "You are strong, smart, kind, and worthy to be loved.",
-  "It's not how you start the race... it's how you finish it.",
+  "It's not how you start the race... it's how you finish it ⌛️.",
   "Sometimes we all need a little help. It's ok to ask.",
   "God loves ❤️ you!",
   "God created you, and God doesn't make mistakes.",
-  "Never let fear win. Don't give up. Try/try again.",
+  "Never let fear win! Don't give up! Try/try again!",
   "You might be nothing to everyone, but to someone you're everything.",
   "Everyone has good and bad days, everyone.",
   "God will protect you.",
@@ -230,10 +230,14 @@ const affirmations = [
   "Someone loves 💖you.",
   "Even if you feel alone, your not. ✞ God is always there.",
   "You have a beautiful heart 💙.",
-  "You wont make as many mistakes if you don't try, but you will never succeed if you don't try.",
-  "God has plans for you, in this world.",
+  "You must try, to succeed",
+  "Jesus loves me this I know, for the Bible tells me so.",
+  "God has big plans for you here.",
   "Your smile brightens the world.",
-  "I forgive me, I forgive myself of my mistakes and bad choices."
+  "I forgive me, I forgive myself for my mistakes and bad choices.",
+  "Because of you, this world is a better place.",
+  "Like a 'bumblebee' is - You're essential, gentle and strong.",
+  "'A' is for always, 'B' is for bounceback, 'C' is for can do."
 ];
 
 // 🌈 Function to show a random affirmation
@@ -267,9 +271,9 @@ function enableSound() {
   document.removeEventListener('click', enableSound);
   document.removeEventListener('touchstart', enableSound);
 
-  // 🩷 Show the affirmation AFTER enabling sound
-  showAffirmation();
+  showAffirmation(); // 🌸 THIS LINE IS CRUCIAL — it shows the affirmation now
 }
+
 
 // --------------------- ON PAGE LOAD ---------------------
 window.onload = function () {
@@ -280,7 +284,7 @@ window.onload = function () {
     displaySavedPlan();
   }
 
-  // Wait for user to interact first
+  // 🩷 Wait for first interaction only, don't show popup yet
   document.addEventListener('click', enableSound, { once: true });
   document.addEventListener('touchstart', enableSound, { once: true });
 };
