@@ -78,13 +78,14 @@ function printSupportList() {
     </html>
   `;
 
-  const win = window.open('', '', 'width=800,height=600');
-  win.document.write(html);
-  win.document.close();
-  win.onload = () => {
-    win.print();
-    win.close();
-  };
+  function printSupportList() {
+    window.print();
+  }
+  
+  function printPlan() {
+    window.print();
+  }
+  
 }
 
 // --------------------- WELLNESS PLAN ---------------------
@@ -226,7 +227,6 @@ const affirmations = [
   "Everyone has good and bad days, everyone.",
   "God will protect you.",
   "God will guide you.",
-  "Jesus loves the little children, all the children of the world 🌎.",
   "Someone loves 💖you.",
   "Even if you feel alone, your not. ✞ God is always there.",
   "You have a beautiful heart 💙.",
