@@ -4,16 +4,17 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #e3f2fd, #fce4ec);
+  background: rgb(243, 238, 174);
   background-size: 300% 300%;
-  animation: backgroundShift 15s ease-in-out infinite;
+  animation: backgroundShift 10s ease-in-out infinite;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 6rem;
   box-sizing: border-box;
   font-family: 'Patrick Hand', cursive;
-  color: #37474f;
+  color: rgb(114, 17, 109);
+  ;
 }
 
 @keyframes backgroundShift {
@@ -24,30 +25,36 @@ html, body {
 
 /* Shared container styles */
 .container, .journal-container {
-  background: #d9c3e7;
-  backdrop-filter: blur(8px);
-  padding: 2rem;
-  border-radius: 2rem;
-  border: 3px solid #6f4876;  
-   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 2rem; /* Keep a little padding so text isn't smashed to the sides */
   margin: 2rem auto;
   width: 100%;
   max-width: 850px;
   box-sizing: border-box;
 }
 
+.page-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 /* Heading styles */
-h1, h2, h3 {
+h1, h2 {
   text-align: center;
-  color: #6a1b9a;
+  color: rgb(114, 17, 109);
+}
+
+h3 {
+  color: rgb(112, 67, 110);
 }
 
 /* Decorative underline for h3 */
 h3::after {
   content: '';
   display: block;
-  border-bottom: 2px dotted #ce93d8;
-  margin-top: 0.5rem;
+  width: 25%; /* controls how long the line is */
+
+  border-bottom: 2px solid rgb(172, 157, 157); /* solid, not dotted */
 }
 
 /* Input and textarea styles */
@@ -81,10 +88,9 @@ button:hover, .toolkit-entry button:hover {
 
 /* Section for saved content */
 .saved-section {
-  background-color: #96cfea;
+  background: #c4edf577;
   padding: 1rem;
   border-radius: 1.5rem;
-  border: 2px dashed #81d4fa;
   margin-top: 2rem;
 }
 
@@ -93,7 +99,7 @@ button:hover, .toolkit-entry button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff3e0;
+  background-color: #12074213;
   padding: 1rem;
   border-radius: 1rem;
   border-left: 6px solid #ffcc80;
@@ -132,7 +138,7 @@ button:hover, .toolkit-entry button:hover {
 /* Navigation icons */
 .nav-icon {
   text-decoration: none;
-  color: #6a1b9a;
+  color: rgb(114, 17, 109);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -161,19 +167,19 @@ button:hover, .toolkit-entry button:hover {
 
 /* Dropdown-style button */
 .dropdown-btn {
-  background-color: #ffb74d;
+  background-color: rgb(15, 46, 131);
   border: none;
   padding: 1rem 2rem;
   font-size: 1.2rem;
   border-radius: 2rem;
-  color: #4e342e;
+  color: white;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   transition: background-color 0.3s ease;
 }
 
 /* Hover for dropdown */
 .dropdown-btn:hover {
-  background-color: #ffa726;
+  background-color: rgb(29, 85, 148);
   color: white;
 }
 
@@ -184,7 +190,7 @@ button:hover, .toolkit-entry button:hover {
   max-width: 600px;
   border-collapse: collapse;
   background-color: #e8f5e9;
-  border: 2px solid #a5d6a7;
+  border: 2px solid #ce93d8;
   border-radius: 1rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
@@ -192,16 +198,15 @@ button:hover, .toolkit-entry button:hover {
 /* Table cells */
 .feel-good-chart td {
   padding: 1rem;
-
   font-size: 1.1rem;
-  color: #33691e;
+  color: rgb(15, 46, 131);
   text-align: center;
-  border-bottom: 1px dashed #aed581;
+  border-bottom: 1px dashed #ce93d8;
 }
 
 /* Hover for table rows */
 .feel-good-chart tr:hover td {
-  background-color: #c5e1a5;
+  background-color: rgb(221, 236, 236);
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -234,8 +239,8 @@ button:hover, .toolkit-entry button:hover {
 /* Fun 3D-styled title */
 .three-d-title {
   font-size: 3rem;
-  color: #7b1fa2;
-  text-shadow: 1px 1px 0 #fff, 2px 2px 0 #ce93d8, 3px 3px 0 #ab47bc;
+  color: rgb(114, 17, 109);
+  text-shadow: 1px 1px 0 #f3e3e3, 2px 2px 0 #c9bebecb, 3px 3px 0 #9ca0adc9;
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -266,7 +271,8 @@ button:hover, .toolkit-entry button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f1f8e9;
+  /*background color for users saved entries */
+  background-color: #53d1c0;
   border-left: 6px solid #934d93;
   padding: .5rem .5rem;
   border-radius: 1rem;
@@ -303,8 +309,7 @@ button:hover, .toolkit-entry button:hover {
 }
 
 .bubble-box {
-  background: #f3e5f5;  /* soft lavender pink */
-  border: 3px dotted #6f4876;  
+  background: rgb(240, 229, 133);
   border-radius: .5rem;
   padding: 1rem;
   margin: 1rem auto;
@@ -315,8 +320,7 @@ button:hover, .toolkit-entry button:hover {
 
 /* Special cloud-styled section */
 .cloud-section {
-  background: #be9cd8;
-  border: 3px dotted #6f4876;  
+  background: rgb(240, 229, 133);
   border-radius: 2rem;
   padding: 2rem;
   margin: 3rem auto;
@@ -357,7 +361,6 @@ button:hover, .toolkit-entry button:hover {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-
 .info-image {
   width: 150px;
   height: auto;
@@ -378,7 +381,7 @@ button:hover, .toolkit-entry button:hover {
   left: 50%;
   transform: translateX(-50%);
   background: #ffffff;
-  color: #6a1b9a;
+  color: blue;
   padding: 2rem 4rem;
   border-radius: 2rem;
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -398,3 +401,9 @@ button:hover, .toolkit-entry button:hover {
   }
 }
 
+.info-row {
+  border: 3px solid #72116d; /* or whatever color you like */
+  border-radius: 12px;        /* optional, for rounded corners */
+  padding: 1rem;              /* optional, adds space inside the border */
+  margin: 1rem 0;             /* optional, adds space around the box */
+}
