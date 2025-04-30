@@ -52,8 +52,7 @@ h3 {
 h3::after {
   content: '';
   display: block;
-  width: 25%; /* controls how long the line is */
-
+  width: 100%; /* controls how long the line is */
   border-bottom: 2px solid rgb(172, 157, 157); /* solid, not dotted */
 }
 
