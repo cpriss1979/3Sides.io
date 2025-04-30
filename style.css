@@ -394,16 +394,15 @@ button:hover, .toolkit-entry button:hover {
   max-width: 500px; /* 🩷 Optional: limit how HUGE it gets */
 }
 
-
-@media print {
-  footer, .bottom-nav {
-    display: none;
-  }
-}
-
 .info-row {
   border: 3px solid #72116d; /* or whatever color you like */
   border-radius: 12px;        /* optional, for rounded corners */
   padding: 1rem;              /* optional, adds space inside the border */
   margin: 1rem 0;             /* optional, adds space around the box */
+}
+
+@media print {
+  footer, .bottom-nav {
+    display: none;
+  }
 }
