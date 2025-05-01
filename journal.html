@@ -27,19 +27,21 @@
       cursor: pointer;
     }
 
+    /* journal.html saved journal entries */
     .entry {
-      background: #c4edf577;
-      border: 1px solid #ce85a6;
-      padding: 1rem;
+      background-color: rgba(218, 227, 241, 0.304);
+      padding: .05rem;
       border-radius: 0.75rem;
       margin-top: 1rem;
       position: relative;
+      border-left: 8px solid rgb(15, 46, 131);
+
     }
 
     .entry time {
       display: block;
       font-size: 0.9rem;
-      color: #666;
+      color: rgba(218, 227, 241, 0.304);
       margin-bottom: 0.5rem;
     }
 
@@ -61,7 +63,7 @@
 </head>
 <body>
   <div class="journal-container">
-    <h2 style="text-align: center; color: rgb(114, 17, 109);
+    <h2 style="text-align: center; color: rgba(69, 111, 179, 0.903);
 ; font-family: 'Patrick Hand', cursive;">🖊️ My Journal</h2>
 
     <div class="bubble-box">
@@ -77,13 +79,12 @@
     <div class="section-divider"></div>
 
 
-    <h2 style="text-align: center; color: rgb(114, 17, 109);
+    <h2 style="text-align: center; color: rgba(69, 111, 179, 0.903);
 ; font-family: 'Patrick Hand', cursive;">📓 Journal entries</h2>
  
 
     <div id="entryList"></div>
   </div>
-
   
   <footer class="bottom-nav">
     <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
