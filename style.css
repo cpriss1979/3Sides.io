@@ -12,8 +12,8 @@ html, body {
   align-items: center;
   padding-bottom: 6rem;
   box-sizing: border-box;
-  font-family: 'Patrick Hand', cursive;
-  color: rgb(114, 17, 109);
+font-family: 'Open Sans', sans-serif;
+  color: black;
   ;
 }
 
@@ -35,17 +35,40 @@ html, body {
 .page-wrapper {
   display: flex;
   justify-content: center;
-  width: 100%;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+
+/* Fun 3D-styled title */
+.three-d-title {
+  font-size: 3rem;
+  color: rgba(69, 111, 179, 0.903);
+  text-shadow: 1px 1px 0 #191d47, 2px 2px 0 #c9bebecb, 3px 3px 0 #9ca0adc9;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-family: 'Quicksand', sans-serif;
 }
 
 /* Heading styles */
-h1, h2 {
-  text-align: center;
-  color: rgb(114, 17, 109);
+h1 {
+color: rgba(69, 111, 179, 0.903);
+text-align: center;
+font-family: 'Open Sans', sans-serif;
 }
 
+h2 {
+  text-align: center;
+  color: rgba(69, 111, 179, 0.903);
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* daily maintenance plan headings for questions */
 h3 {
-  color: rgb(112, 67, 110);
+  color: rgba(69, 111, 179, 0.903);
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
 }
 
 /* Decorative underline for h3 */
@@ -62,7 +85,7 @@ input[type="text"], textarea {
   padding: 1rem;
   font-size: 1rem;
   border-radius: 1rem;
-  border: 2px solid #ce93d8;
+  border: 2px solid rgba(69, 111, 179, 0.903);
   background-color: #f1f8e9;
   resize: vertical;
   margin-top: 0.5rem;
@@ -85,25 +108,23 @@ button:hover, .toolkit-entry button:hover {
   background-color: #66bb6a;
 }
 
-/* Section for saved content */
-.saved-section {
-  background: #c4edf577;
-  padding: 1rem;
-  border-radius: 1.5rem;
-  margin-top: 2rem;
-}
+
 
 /* Style for each support item */
 .support-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #12074213;
+  background-color: rgba(218, 227, 241, 0.304);
   padding: 1rem;
   border-radius: 1rem;
-  border-left: 6px solid #ffcc80;
+  border-left: 8px solid rgb(15, 46, 131);
   margin-bottom: 0.75rem;
 }
+
+
+
+
 
 /* Delete button styles */
 .delete-button {
@@ -126,7 +147,7 @@ button:hover, .toolkit-entry button:hover {
   bottom: 0;
   width: 100%;
   background: #fafafa;
-  border-top: 2px solid #ce93d8;
+  border-top: 2px solid #242224;
   display: flex;
   justify-content: space-around;
   padding: 0.5rem 0;
@@ -137,7 +158,7 @@ button:hover, .toolkit-entry button:hover {
 /* Navigation icons */
 .nav-icon {
   text-decoration: none;
-  color: rgb(114, 17, 109);
+  color: rgba(69, 111, 179, 0.903);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -152,7 +173,7 @@ button:hover, .toolkit-entry button:hover {
 
 /* Hover effect for nav icons */
 .nav-icon:hover {
-  color: #ab47bc;
+  color: #72aadf;
 }
 
 /* Button row layout */
@@ -189,7 +210,7 @@ button:hover, .toolkit-entry button:hover {
   max-width: 600px;
   border-collapse: collapse;
   background-color: #e8f5e9;
-  border: 2px solid #ce93d8;
+  border: 2px solid #0a0a86;
   border-radius: 1rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
@@ -198,7 +219,7 @@ button:hover, .toolkit-entry button:hover {
 .feel-good-chart td {
   padding: 1rem;
   font-size: 1.1rem;
-  color: rgb(15, 46, 131);
+  color: rgba(69, 111, 179, 0.903);
   text-align: center;
   border-bottom: 1px dashed #ce93d8;
 }
@@ -235,15 +256,6 @@ button:hover, .toolkit-entry button:hover {
   box-sizing: border-box;
 }
 
-/* Fun 3D-styled title */
-.three-d-title {
-  font-size: 3rem;
-  color: rgb(114, 17, 109);
-  text-shadow: 1px 1px 0 #f3e3e3, 2px 2px 0 #c9bebecb, 3px 3px 0 #9ca0adc9;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
 /* Repeat of bottom nav (for backup or overwrite) */
 .bottom-nav {
   position: fixed;
@@ -251,7 +263,7 @@ button:hover, .toolkit-entry button:hover {
   left: 0;
   width: 100%;
   background: #fafafa;
-  border-top: 1px solid #ce93d8;
+  border-top: 1px solid rgba(69, 111, 179, 0.903);;
   display: flex;
   justify-content: space-around;
   padding: 0.8rem 0;
@@ -271,8 +283,9 @@ button:hover, .toolkit-entry button:hover {
   justify-content: space-between;
   align-items: center;
   /*background color for users saved entries */
-  background-color: #53d1c0;
-  border-left: 6px solid #934d93;
+  background-color: rgba(218, 227, 241, 0.304);
+ /* side border  on toolkit.html */
+  border-left: 8px solid rgb(15, 46, 131);
   padding: .5rem .5rem;
   border-radius: 1rem;
   margin-bottom: 0.75rem;
@@ -281,13 +294,13 @@ button:hover, .toolkit-entry button:hover {
 }
 
 .toolkit-item:hover {
-  background-color: #fff3cd;
+  background-color: #dee4eb;
 }
 
 .toolkit-item span {
   flex-grow: 1;
-  font-size: 1.5rem;
-  color: #4e342e;
+  font-size: 1rem;
+  color: black;
 }
 
 /* Cute X button */
@@ -307,8 +320,9 @@ button:hover, .toolkit-entry button:hover {
   transform: scale(1.1);
 }
 
+/* journal.html */
 .bubble-box {
-  background: rgb(240, 229, 133);
+  background: rgba(152, 181, 224, 0.903);;
   border-radius: .5rem;
   padding: 1rem;
   margin: 1rem auto;
@@ -324,12 +338,12 @@ button:hover, .toolkit-entry button:hover {
   padding: 2rem;
   margin: 3rem auto;
   max-width: 800px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+  color: white;
   text-align: center;
 }
 
 .section-divider {
-  border-top: 2px dashed #d8b4dd;
+  border-top: 2px dashed rgba(69, 111, 179, 0.903);;
   margin: 2rem 0;
   width: 80%;
   max-width: 600px;
@@ -340,7 +354,7 @@ button:hover, .toolkit-entry button:hover {
 .section-divider {
   border: none;
   height: 2px;
-  background: linear-gradient(to right, transparent, #8a618a, transparent);
+  background: linear-gradient(to right, transparent, rgba(69, 111, 179, 0.903), transparent);
   margin: 2rem auto;
   width: 80%;
 }
@@ -380,7 +394,7 @@ button:hover, .toolkit-entry button:hover {
   left: 50%;
   transform: translateX(-50%);
   background: #ffffff;
-  color: blue;
+  color: rgb(20, 20, 170);
   padding: 2rem 4rem;
   border-radius: 2rem;
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -394,7 +408,7 @@ button:hover, .toolkit-entry button:hover {
 }
 
 .info-row {
-  border: 3px solid #72116d; /* or whatever color you like */
+  border: 3px solid rgba(69, 111, 179, 0.903);/* or whatever color you like */
   border-radius: 12px;        /* optional, for rounded corners */
   padding: 1rem;              /* optional, adds space inside the border */
   margin: 1rem 0;             /* optional, adds space around the box */
