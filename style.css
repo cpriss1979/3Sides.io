@@ -16,7 +16,9 @@ html, body {
   font-family: 'Open Sans', sans-serif;
   color: #2f3b5c; /* Calm dark text */
   background-color: #eef3fa; /* Subtle light blue background */
+  overflow-x: hidden; /* 💥 Stops sideways scrolling */
 }
+
 
 /* Animated gradient shift */
 @keyframes backgroundShift {
@@ -315,7 +317,6 @@ button:hover, .toolkit-entry button:hover {
 
 .info-text {
   max-width: 600px;
-  padding: 1rem;
   flex: 1;
 }
 
@@ -363,3 +364,17 @@ p {
   font-size: 1.1rem;
   color: #2f3b5c;
 }
+
+.container, .page-wrapper, .mood-section, .cloud-section {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.info-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
