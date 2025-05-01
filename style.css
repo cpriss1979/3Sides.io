@@ -301,8 +301,8 @@ button:hover, .toolkit-entry button:hover {
   max-width: 450px;
   justify-content: center;
   text-align: left;
-  background: #fefefe;
-  border: 3px solid rgba(69, 111, 179, 0.903);
+  background: hwb(315 83% 8%);
+  border: 3px solid rgba(29, 84, 148, 0.684);
   border-radius: 2rem;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
