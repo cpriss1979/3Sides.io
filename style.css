@@ -42,6 +42,10 @@ html, body {
   box-sizing: border-box;
 }
 
+.container {
+  padding: 2rem;
+}
+
 .page-wrapper {
   display: flex;
   align-items: center;
@@ -81,7 +85,7 @@ html, body {
   text-align: center;
   margin-bottom: 2rem;
   font-family: 'Caveat', cursive;
-;
+
 }
 
 /* Heading styles */
@@ -90,7 +94,7 @@ h1, h2, h3 {
 color: black;
   font-family: 'Open Sans', sans-serif;
   margin-top: .5rem; /* Adjust this value as needed */
-
+  font-size: 1.75rem;
 }
 
 h3{
