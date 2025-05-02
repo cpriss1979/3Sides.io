@@ -15,7 +15,7 @@ html, body {
   box-sizing: border-box;
   font-family: 'Open Sans', sans-serif;
   color: #2f3b5c; /* Calm dark text */
-  background-color: #eef3fa; /* Subtle light blue background */
+  background: #e0f7fa; /* Calming aqua */
   overflow-x: hidden; /* 💥 Stops sideways scrolling */
 }
 
@@ -334,18 +334,11 @@ button:hover, .toolkit-entry button:hover {
   padding-top: 0;
 }
 
-
 .info-image {
   width: 150px;
   height: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
-
-
-
-
-
-
 
 .info-text {
   max-width: 600px;
@@ -386,7 +379,7 @@ p {
 
 /* last section of index.html: stability, mania, hypomania, etc */
 .mood-section {
-  background:#ffffff; /* clean white or use a soft pastel! */
+  background: #e0f7fa; /* Calming aqua */
   padding: .25rem;
   margin: .25rem auto;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
