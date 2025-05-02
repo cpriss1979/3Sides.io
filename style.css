@@ -91,7 +91,7 @@ html, body {
 /* Heading styles */
 h1, h2, h3 {
   text-align: center;
-color: black;
+color: rgba(69, 111, 179, 0.903);
   font-family: 'Open Sans', sans-serif;
   margin-top: .5rem; /* Adjust this value as needed */
   font-size: 1.75rem;
@@ -138,7 +138,7 @@ button:hover, .toolkit-entry button:hover {
   justify-content: space-between;
   align-items: center;
   background-color: rgba(218, 227, 241, 0.304);
-  padding: 1rem;
+  padding: .2rem;
   border-radius: 1rem;
   border-left: 8px solid rgb(15, 46, 131);
   margin-bottom: 0.75rem;
@@ -291,7 +291,7 @@ button:hover, .toolkit-entry button:hover {
 }
 
 .bubble-box {
-  background: #e7a7b3; /* journal.html */
+  background: #e7a7b3; /* journal.html (same as index.html top color) */
   border-radius: 2rem;
   padding: 1rem;
   margin: 2rem auto;
@@ -332,7 +332,6 @@ button:hover, .toolkit-entry button:hover {
   flex-wrap: wrap;
   max-width: 600px;
   padding: 2rem;
-
   background: hwb(315 83% 8%);
   text-align: left;
   justify-content: left;
@@ -362,6 +361,7 @@ button:hover, .toolkit-entry button:hover {
   flex: 1;
 }
 
+/* toolkit.html */
 .affirmation-popup {
   position: fixed;
   top: 150px;
@@ -414,6 +414,7 @@ p {
   overflow-x: hidden;
 }
 
+/* index.html image */
 .info-image {
   max-width: 100%;
   height: auto;
@@ -424,6 +425,8 @@ p {
   text-align: left;
 }
 
+/* index.html bottom section: stability, mania, hypomania, etc */
 .mood-section p {
   text-align: left;
 }
+
