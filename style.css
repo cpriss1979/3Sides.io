@@ -42,6 +42,15 @@ html, body {
   box-sizing: border-box;
 }
 
+.page-wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  margin-top: 2rem; /* 👈 This adds space at the top */
+}
+
+
 .touching-sections {
   margin-bottom: 0 !important;
   margin-top: 0 !important;
@@ -78,7 +87,7 @@ html, body {
 /* Heading styles */
 h1, h2, h3 {
   text-align: center;
-  color: rgba(69, 111, 179, 0.903);
+color: black;
   font-family: 'Open Sans', sans-serif;
   margin-top: .5rem; /* Adjust this value as needed */
 
