@@ -42,6 +42,20 @@ html, body {
   box-sizing: border-box;
 }
 
+.touching-sections {
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+
+.cloud-section {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.mood-section {
+  margin-top: 0 !important;
+}
+
 
 .page-wrapper {
   display: flex;
@@ -74,13 +88,7 @@ h3{
     color: #5c6bc0;
 }
 
-/* Underline for h3 elements */
-h3::after {
-  content: '';
-  display: block;
-  width: 100%;
-  border-bottom: 2px solid rgb(172, 157, 157);
-}
+
 
 /* Inputs and textareas */
 input[type="text"], textarea {
@@ -279,6 +287,7 @@ button:hover, .toolkit-entry button:hover {
   max-width: 800px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.05);
   text-align: center;
+  border-top: 5px solid #2f3b5c; /* or any color and thickness you like */
 }
 
 .cloud-section {
@@ -290,7 +299,6 @@ button:hover, .toolkit-entry button:hover {
   width: 100%;
   box-sizing: border-box;
   margin-top: 0;
-  margin-bottom: 1.5rem; /* or whatever spacing you want below it */
 }
 
 .section-divider {
