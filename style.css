@@ -36,7 +36,7 @@ html, body {
 .mood-section, 
 .cloud-section {
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 1.5rem;
   box-sizing: border-box;
@@ -87,8 +87,6 @@ h1, h2, h3 {
 h3{
     color: #5c6bc0;
 }
-
-
 
 /* Inputs and textareas */
 input[type="text"], textarea {
@@ -247,7 +245,7 @@ button:hover, .toolkit-entry button:hover {
   text-align: center;
   margin: 1rem auto;
   width: 100%;
-  max-width: 700px;
+  max-width: 600px;
   box-sizing: border-box;
 }
 
@@ -284,7 +282,7 @@ button:hover, .toolkit-entry button:hover {
   border-radius: 2rem;
   padding: 2rem;
   margin: 3rem auto;
-  max-width: 800px;
+  max-width: 600px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.05);
   text-align: center;
   border-top: 5px solid #2f3b5c; /* or any color and thickness you like */
@@ -292,7 +290,7 @@ button:hover, .toolkit-entry button:hover {
 
 .cloud-section {
   background: #e7a7b3; /* soft pastel index.html */
-  max-width: 800px;
+  max-width: 600px;
   color: #2f3b5c;
   text-align: center;
   padding: 1.8rem;
@@ -309,10 +307,6 @@ button:hover, .toolkit-entry button:hover {
   max-width: 600px;
 }
 
-
-
-
-
 /* index.html top container with image */
 .info-row {
   display: flex;
@@ -320,7 +314,7 @@ button:hover, .toolkit-entry button:hover {
   gap: 1.5rem;
   width: 100%;
   flex-wrap: wrap;
-  max-width: 800px;
+  max-width: 600px;
   padding: 2rem;
   background: hwb(315 83% 8%);
   text-align: left;
@@ -346,6 +340,12 @@ button:hover, .toolkit-entry button:hover {
   height: auto;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
+
+
+
+
+
+
 
 .info-text {
   max-width: 600px;
@@ -390,7 +390,7 @@ p {
   padding: .25rem;
   margin: .25rem auto;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-  max-width: 800px;
+  max-width: 600px;
   width: 95%;
   line-height: 1.6;
   font-size: 1.1rem;
@@ -399,7 +399,7 @@ p {
 
 .container, .page-wrapper, .mood-section, .cloud-section {
   width: 100%;
-  max-width: 100%;
+  max-width: 600px;
   box-sizing: border-box;
   overflow-x: hidden;
 }
