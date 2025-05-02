@@ -435,22 +435,61 @@ body.support-page .container {
 }
 
 /* index.html dropbox */
+/* Container for the dropdowns */
 .dropdown-section {
-  width: 39%;
-  max-width: 600px;
+  width: 90%;
+  max-width: 320px;
   margin: 2rem auto;
   text-align: left;
 }
 
+/* Style for the box */
 details {
   background-color: #ffffffc9;
   border: 2px solid rgba(69, 111, 179, 0.903);
   border-left: 8px solid rgb(15, 46, 131);
   border-radius: 1rem;
-  padding: 1rem;
-  margin-bottom: .7rem;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.7rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   font-family: 'Open Sans', sans-serif;
+}
+
+details {
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+}
+
+/* Style for the <summary> (dropdown label) */
+summary {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2f3b5c;
+  cursor: pointer;
+  outline: none;
+  padding-left: 0.2rem;
+  text-align: left;
+  display: list-item; /* restores arrow */
+}
+
+/* Keeps arrow visible and uniform */
+summary::marker {
+  font-size: 1.3rem;
+  color: #2f3b5c;
+}
+
+/* Style when open */
+details[open] summary {
+  color: #e896a5;
+}
+
+/* Text content inside dropdown */
+details p {
+  margin: 0.8rem 0 0 0;
+  font-size: 1rem;
+  color: #2f3b5c;
+  line-height: 1.5;
+  text-align: justify;
 }
 
 summary {
@@ -459,8 +498,11 @@ summary {
   color: #2f3b5c;
   cursor: pointer;
   outline: none;
-  }
-  
+  text-align: left;
+  padding-left: .5rem; /* adjust as needed to shift the arrow right a bit */
+  position: relative;
+}
+
 
 details[open] summary {
   color: #e896a5;
@@ -471,4 +513,52 @@ details p {
   font-size: 1rem;
   color: #2f3b5c;
   line-height: 1.5;
+}
+
+summary {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2f3b5c;
+  cursor: pointer;
+  outline: none;
+  text-align: left;
+  padding-left: .5rem; /* shifts text right so arrow stays lined up */
+  position: relative;
+}
+
+/* Uniform arrow placement for all dropdowns */
+summary::marker {
+  font-size: 1.3rem; /* make sure it's same size everywhere */
+  color: #2f3b5c; /* same color as text */
+}
+
+details summary {
+  min-height: 2.5rem;
+  align-items: center;
+}
+
+summary::marker {
+  font-size: 1.3rem;
+  color: #2f3b5c;
+}
+
+details summary {
+  display: list-item; /* keeps default arrow style */
+  min-height: 2.5rem;
+}
+
+@media (max-width: 500px) {
+  .dropdown-section {
+    width: 95%;
+    max-width: 300px;
+  }
+
+  details {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  summary {
+    font-size: 1.05rem;
+  }
 }
