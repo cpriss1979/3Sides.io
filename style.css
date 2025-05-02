@@ -28,21 +28,20 @@ html, body {
 }
 
 /* journal.html layout containers */
-.journal-container {
-  padding: 2rem;
-  margin: 2rem auto;
+/* index.html layout containers */
+/* Base container styling for layout */
+.container, 
+.info-row, 
+.journal-container, 
+.mood-section, 
+.cloud-section {
   width: 100%;
-  max-width: 850px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
   box-sizing: border-box;
 }
 
-/* index.html layout containers */
-.container, .info-row {
-  padding: 3.8rem;
-  width: 100%;
-  max-width: 850px;
-  box-sizing: border-box;
-}
 
 .page-wrapper {
   display: flex;
@@ -284,11 +283,14 @@ button:hover, .toolkit-entry button:hover {
 
 .cloud-section {
   background: #e7a7b3; /* soft pastel index.html */
-  padding: 2rem;
   max-width: 800px;
-  margin: -.05rem auto;
   color: #2f3b5c;
   text-align: center;
+  padding: 1.8rem;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0;
+  margin-bottom: 1.5rem; /* or whatever spacing you want below it */
 }
 
 .section-divider {
@@ -307,15 +309,27 @@ button:hover, .toolkit-entry button:hover {
 .info-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   width: 100%;
   flex-wrap: wrap;
   max-width: 800px;
-padding: 2rem;
+  padding: 2rem;
   background: hwb(315 83% 8%);
   text-align: left;
   justify-content: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.info-row,
+.cloud-section {
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+.info-row,
+.cloud-section {
+  padding-bottom: 0;
+  padding-top: 0;
 }
 
 
