@@ -37,7 +37,7 @@ html, body {
 }
 
 /* index.html layout containers */
-.container {
+.container, .info-row {
   padding: 3.8rem;
   width: 100%;
   max-width: 850px;
@@ -299,25 +299,29 @@ button:hover, .toolkit-entry button:hover {
   max-width: 600px;
 }
 
+
+
+
+
 /* index.html top container with image */
 .info-row {
   display: flex;
   align-items: center;
   gap: 1rem;
+  width: 100%;
   flex-wrap: wrap;
-  margin: -2rem auto;
-  max-width: 450px;
-  justify-content: center;
-  text-align: left;
+  max-width: 800px;
+padding: 2rem;
   background: hwb(315 83% 8%);
-  padding: 2.5rem;
+  text-align: left;
+  justify-content: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
+
 
 .info-image {
   width: 150px;
   height: auto;
-  border-radius: 2.5rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
