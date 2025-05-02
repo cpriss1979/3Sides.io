@@ -56,7 +56,6 @@ html, body {
   margin-top: 0 !important;
 }
 
-
 .page-wrapper {
   display: flex;
   align-items: center;
@@ -80,7 +79,7 @@ h1, h2, h3 {
   text-align: center;
   color: rgba(69, 111, 179, 0.903);
   font-family: 'Open Sans', sans-serif;
-  margin-top: .05rem; /* Adjust this value as needed */
+  margin-top: .5rem; /* Adjust this value as needed */
 
 }
 
@@ -297,6 +296,9 @@ button:hover, .toolkit-entry button:hover {
   width: 100%;
   box-sizing: border-box;
   margin-top: 0;
+  border-bottom: 2px solid rgba(69, 111, 179, 0.903);
+
+
 }
 
 .section-divider {
@@ -309,6 +311,8 @@ button:hover, .toolkit-entry button:hover {
 
 /* index.html top container with image */
 .info-row {
+  border-top: 2px solid rgba(69, 111, 179, 0.903);
+
   display: flex;
   align-items: center;
   gap: 1.5rem;
