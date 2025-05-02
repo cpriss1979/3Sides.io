@@ -38,7 +38,7 @@ html, body {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1.5rem 1.2rem; /* Top/bottom 1.5rem, sides 1.2rem */
   box-sizing: border-box;
 }
 
@@ -85,7 +85,7 @@ h1, h2, h3 {
 }
 
 h3{
-    color: #5c6bc0;
+    color: #e896a5;
 }
 
 /* Inputs and textareas */
@@ -384,8 +384,8 @@ p {
 /* last section of index.html: stability, mania, hypomania, etc */
 .mood-section {
   background: #e0f7fa; /* Calming aqua */
-  padding: .25rem;
-  margin: .25rem auto;
+  padding: 1.5rem 1.2rem;
+  margin: 0 auto;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
   max-width: 600px;
   width: 95%;
@@ -407,3 +407,10 @@ p {
   display: block;
 }
 
+p {
+  text-align: left;
+}
+
+.mood-section p {
+  text-align: left;
+}
