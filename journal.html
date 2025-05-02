@@ -8,7 +8,154 @@
 
   <style>
     textarea {
+      width: 95%;<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <link rel="stylesheet" href="style.css"/>
+  <title>My Journal</title>
+
+  <style>
+    textarea {
       width: 95%;
+      height: 100px;
+      font-size: 1.1rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 2px solid #ccc;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      background-color: #ff8aa1;
+      border: none;
+      border-radius: 0.5rem;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* journal.html saved journal entries */
+    .entry {
+      background-color: rgba(218, 227, 241, 0.304);
+      padding: .75rem;
+      border-radius: 0.75rem;
+      margin-top: 1rem;
+      position: relative;
+      border-left: 8px solid rgb(15, 46, 131);
+
+    }
+
+    .entry time {
+      display: block;
+      font-size: 0.9rem;
+      color: rgba(218, 227, 241, 0.304);
+      margin-bottom: 0.5rem;
+    }
+
+    .delete-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: #c52e3f;
+      cursor: pointer;
+    }
+
+    .delete-button:hover {
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="journal-container">
+    <h2 style="text-align: center; color: black; 
+      margin-top: 2rem; 
+      font-size: 1.75rem;
+font-family: 'Open Sans', sans-serif;">🖊️ My Journal</h2>
+
+    <div class="bubble-box">
+    </p><p style="font-size: 1.1rem; rgb(188, 71, 96); font-family: 'Patrick Hand', cursive; margin: 0;">
+    Keeping a journal when you have bipolar isn’t just helpful — it’s powerful. Writing down your thoughts, feelings, triggers, and wins creates a safe space to process what you're going through. It helps you recognize patterns in your moods, track early warning signs, and gain insight into what helps or hurts your stability. On tough days, it can be a quiet companion, and on better days, it can remind you of your strength. Journaling can be an act of self-care, self-discovery, and healing — all on your terms, in your words. And best of all? It’s just for you.
+      </p>
+    </div>
+    
+    <textarea id="journalEntry" placeholder="Write your thoughts here..."></textarea>
+    <button onclick="saveJournalEntry()">Save Entry</button>
+
+
+    <div class="section-divider"></div>
+
+
+    <h2 style="text-align: center; color: black;
+; font-family: 'Patrick Hand', cursive;">📓 Journal entries</h2>
+ 
+
+    <div id="entryList"></div>
+  </div>
+  
+  <footer class="bottom-nav">
+    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
+    <a href="toolkit.html" class="nav-icon">🧰<span>Toolkit</span></a>
+    <a href="wellnessPlan.html" class="nav-icon">✨<span>Plan</span></a>
+    <a href="journal.html" class="nav-icon">📓<span>Journal</span></a>
+    <a href="support.html" class="nav-icon">🫂<span>Support</span></a>
+    <a href="important-numbers.html" class="nav-icon">🆘<span>Quick Help</span></a>
+  </footer>
+  
+  <script>
+    function loadEntries() {
+      const entries = JSON.parse(localStorage.getItem('journalEntries') || '[]');
+      const list = document.getElementById('entryList');
+      list.innerHTML = '';
+
+      entries.forEach((entry, index) => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        div.innerHTML = `
+          <button class="delete-button" onclick="deleteEntry(${index})">❌</button>
+          <time>${entry.timestamp}</time>
+          <p>${entry.text}</p>
+        `;
+        list.prepend(div);
+      });
+    }
+
+    function saveJournalEntry() {
+      const textarea = document.getElementById('journalEntry');
+      const text = textarea.value.trim();
+      if (text === '') return;
+
+      const entry = {
+        timestamp: new Date().toLocaleString(),
+        text
+      };
+
+      const existingEntries = JSON.parse(localStorage.getItem('journalEntries') || '[]');
+      existingEntries.push(entry);
+      localStorage.setItem('journalEntries', JSON.stringify(existingEntries));
+
+      textarea.value = '';
+      loadEntries();
+    }
+
+    function deleteEntry(index) {
+      const entries = JSON.parse(localStorage.getItem('journalEntries') || '[]');
+      entries.splice(index, 1); // remove 1 entry at index
+      localStorage.setItem('journalEntries', JSON.stringify(entries));
+      loadEntries();
+    }
+
+    // Load on page load
+    window.onload = loadEntries;
+  </script>
+</body>
+</html>
+
       height: 100px;
       font-size: 1.1rem;
       padding: 1rem;
