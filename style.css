@@ -322,29 +322,31 @@ button:hover, .toolkit-entry button:hover {
 .info-row {
   display: flex;
   flex-direction: row-reverse;
-  align-items: stretch; /* this is good — keep it */
-  justify-content: flex-start;
-  gap: 1rem;
-  width: 100%;
-  max-width: 600px;
-  background: hwb(315 83% 8%);
+  align-items: stretch;
+  justify-content: space-between;
+  background: hwb(315 83% 8%); /* your pink background */
+  padding: 1.2rem;
   box-sizing: border-box;
+  gap: 1rem;
 }
 
 .info-image {
-  width: 100%;
-  max-width: 250px;
-  height: auto; /* ✅ This keeps the image naturally proportioned */
+  width: 40%;
+  max-width: none;
+  height: auto;
   object-fit: cover;
   border-radius: 1rem;
+  align-self: stretch; /* ✅ this makes image match text box height */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  align-self: stretch; /* ✅ Add this line */
 }
 
 .info-text {
   flex: 1;
   display: flex;
-  align-items: center;        /* Center text vertically next to image */
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: transparent;
 }
 
 .info-row,
@@ -581,3 +583,4 @@ details summary {
     max-width: 60px;
   }
 }
+
