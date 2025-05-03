@@ -321,46 +321,33 @@ button:hover, .toolkit-entry button:hover {
 /* index.html top container with image */
 .info-row {
   display: flex;
-  align-items: center; /* center-aligns image and text vertically */
+  align-items: stretch; /* 👈 makes image stretch full height of container */
   gap: 1.5rem;
-  flex-wrap: wrap; /* still allows wrapping for tiny screens */
   width: 100%;
   max-width: 600px;
   padding: 2rem;
   background: hwb(315 83% 8%);
-  text-align: left;
   justify-content: flex-start;
+  text-align: left;
 }
 
 
 .info-image {
-  flex-shrink: 0;
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
+  aspect-ratio: 1 / 1; /* 👈 keeps it square */
   object-fit: cover;
-  border-radius: 0rem;
+  border-radius: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.info-image {
-  flex-shrink: 0;
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 1rem; /* 👈 this gives you the soft rounded corners */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  display: block;
-  margin-top: 3rem;
-  margin-bottom: 3rem;
 }
 
 
 .info-text {
   flex: 1;
   display: flex;
-  align-items: center;
-  min-height: 120px; /* matches the image height */
+  align-items: center; /* center the paragraph vertically */
 }
+
 
 
 .info-row,
