@@ -327,7 +327,7 @@ button:hover, .toolkit-entry button:hover {
   width: 100%;
   flex-wrap: wrap;
   max-width: 600px;
-  padding: 8rem;
+  padding: 5rem;
   background: hwb(315 83% 8%);
   text-align: left;
   justify-content: left;
