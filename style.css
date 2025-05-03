@@ -321,16 +321,17 @@ button:hover, .toolkit-entry button:hover {
 /* index.html top container with image */
 .info-row {
   display: flex;
-  align-items: center;
+  align-items: center; /* center-aligns image and text vertically */
   gap: 1.5rem;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* still allows wrapping for tiny screens */
   width: 100%;
   max-width: 600px;
   padding: 2rem;
   background: hwb(315 83% 8%);
   text-align: left;
-  justify-content: left;
+  justify-content: flex-start;
 }
+
 
 .info-image {
   flex-shrink: 0;
@@ -358,9 +359,9 @@ button:hover, .toolkit-entry button:hover {
   flex: 1;
   display: flex;
   align-items: center;
-  font-size: 1rem;
-  line-height: 1.4;
+  min-height: 120px; /* matches the image height */
 }
+
 
 .info-row,
 .cloud-section {
