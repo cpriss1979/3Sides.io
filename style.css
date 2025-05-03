@@ -319,23 +319,19 @@ button:hover, .toolkit-entry button:hover {
 }
 
 /* index.html top container with image */
-.info-row {
-  display: flex;
-  align-items: stretch; /* 👈 makes image stretch full height of container */
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 600px;
-  padding: 2rem;
-  background: hwb(315 83% 8%);
-  justify-content: flex-start;
-  text-align: left;
+.info-image {
+  width: 200px;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
 
 
 .info-image {
   width: 200px;
-  height: 200px;
-  aspect-ratio: 1 / 1; /* 👈 keeps it square */
+  height: 100%;
   object-fit: cover;
   border-radius: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -575,3 +571,10 @@ details summary {
   }
 }
 
+.info-image {
+  width: 200px;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
