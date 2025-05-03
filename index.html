@@ -2,74 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand&family=Open+Sans&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Welcome to 3-Sides Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&family=Open+Sans&family=Patrick+Hand&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
   <style>
-    .dropdown-section {
+    .page-header {
       width: 100%;
       max-width: 600px;
-      margin: 2rem auto;
-    }
-
-    details {
-      background-color: #ffffffc9;
-      border: 2px solid rgba(69, 111, 179, 0.903);
-      border-left: 8px solid rgb(15, 46, 131);
-      border-radius: 1rem;
+      margin: 1rem auto 2rem;
+      text-align: center;
       padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    .tagline {
+      font-family: 'Patrick Hand', cursive;
+      font-size: 1.1rem;
+      color: #4b6578;
+      margin-top: -0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-image {
+  object-fit: cover;
+}
+
+.image-text-box,
+.cloud-section {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+  border-radius: 0; /* Optional */
+}
+
+
+
+    .hero-image {
+      width: 100%;
+      max-height: 300px;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       margin-bottom: 1rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      font-family: 'Open Sans', sans-serif;
     }
 
-  
-
-    details[open] summary {
-      color: #e896a5;
-    }
-
-    details p {
-      margin-top: 0.8rem;
+    .hero-caption {
       font-size: 1rem;
-      color: #2f3b5c;
-      line-height: 1.6;
+      font-weight: 600;
+      color: #1d578a;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
     }
 
-.info-text {
-  background: #f7c7e2; /* soft pastel */
-  padding: 1.5rem 1rem;
-  border-bottom: 2px solid rgba(69, 111, 179, 0.903);
-  border-top: 2px solid rgba(69, 111, 179, 0.903);
-  border-radius: 0rem;
-}
-
-.index-page .three-d-title {
-  margin-bottom: 1rem; /* shrink space below title */
-}
-
+    .intro-paragraph p {
+      font-size: 0.95rem;
+      color: #2f3b5c;
+      margin-top: 0;
+    }
   </style>
 </head>
 <body class="index-page">
-  <div class="page-wrapper">
+
+  <!-- 🌸 Redesigned Top Section -->
+  <div class="page-header">
     <h1 class="three-d-title">🎭 3-Sides Planner</h1>
+    <div class="image-text-box">
+      <img src="relax.png" alt="Relaxing mental health image" class="hero-image">
+      <p class="hero-caption">
+        When we or someone we love is living with bipolar disorder, it’s important to pause and ask: <em>What is bipolar?</em>
+      </p>
 
-   <div class="info-row">
-  <div class="info-text">
-    <p>
-      When we or someone we love is living with bipolar disorder, it’s important to pause and ask: <em>What is bipolar?</em>
-    </p>
-  </div>
-  <img src="relax.png" alt="Relaxing mental health image" class="info-image">
-</div>
-
-    <div class="cloud-section touching-sections">      
-      <p style="font-size: .9rem; color: black; font-family: 'Open Sans', sans-serif;">
+      <br>
+      <p>
         <strong>3-Sides</strong> represents the emotional shifts of bipolar life: the highs, the lows, and the moments of balance. This planner helps you make sense of it all, one day at a time.
       </p>
+
+
+
     </div>
+
+    <div class="cloud-section intro-paragraph">      
+
+
+
     </div>
+  </div>
+
 
     <div class="dropdown-section">
       <details>
