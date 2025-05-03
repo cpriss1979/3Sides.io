@@ -319,13 +319,13 @@ button:hover, .toolkit-entry button:hover {
 }
 
 /* index.html top container with image */
-..info-row {
+.info-row {
   display: flex;
-  align-items: stretch; /* ✅ equal height */
+  flex-direction: column;
+  align-items: center; /* ✅ equal height */
   justify-content: space-between;
   gap: 1.2rem;
-  padding: 2rem;
-  background: hwb(315 83% 8%); /* soft pink */
+  padding: 1.5rem 1rem;
   border-radius: 1.2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
@@ -346,8 +346,8 @@ button:hover, .toolkit-entry button:hover {
 
 .info-image {
   width: 50%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;           /* let the image decide height */
+  object-fit: contain; 
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   align-self: stretch;
@@ -558,3 +558,20 @@ details summary {
   }
 }
 
+@media (max-width: 600px) {
+  .info-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .info-image {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+  }
+
+  .info-text {
+    text-align: center;
+    padding-top: 1rem;
+  }
+}
