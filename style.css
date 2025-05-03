@@ -321,23 +321,11 @@ button:hover, .toolkit-entry button:hover {
 /* index.html top container with image */
 .info-image {
   width: 200px;
-  height: 100%;
   object-fit: cover;
-  border-radius: 0;
+  border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.info-row {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 600px;
-  background: hwb(315 83% 8%);
-  padding: 2rem;
-  box-sizing: border-box;
-  justify-content: flex-start;
+  height: auto; /* Let it size naturally with text */
+  display: block;
 }
 
 
@@ -353,6 +341,21 @@ button:hover, .toolkit-entry button:hover {
   box-sizing: border-box;
   justify-content: flex-start;
 }
+
+
+.info-row {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch; /* 👈 Makes image same height as text */
+  justify-content: flex-start;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+  background: hwb(315 83% 8%);
+  padding: 0;
+  box-sizing: border-box;
+}
+
 
 .info-text {
   flex: 1;
