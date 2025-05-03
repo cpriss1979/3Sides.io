@@ -328,7 +328,6 @@ button:hover, .toolkit-entry button:hover {
   width: 100%;
   max-width: 600px;
   background: hwb(315 83% 8%);
-  padding: 0;
   box-sizing: border-box;
 }
 
