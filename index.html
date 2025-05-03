@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <link href="https://fonts.googleapis.com/css2?family=Quicksand&family=Open+Sans&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="stylesheet" href="style.css"/>
   <title>Welcome to 3-Sides Planner</title>
+  <link rel="stylesheet" href="style.css"/>
   <style>
     .dropdown-section {
       width: 100%;
@@ -36,26 +36,36 @@
       color: #2f3b5c;
       line-height: 1.6;
     }
+
+.info-text {
+  background: #f7c7e2; /* soft pastel */
+  padding: 1.5rem 1rem;
+  border-bottom: 2px solid rgba(69, 111, 179, 0.903);
+  border-top: 2px solid rgba(69, 111, 179, 0.903);
+  border-radius: 0rem;
+}
+
+.index-page .three-d-title {
+  margin-bottom: 1rem; /* shrink space below title */
+}
+
   </style>
 </head>
-<body>
-  <br><br><br>
+<body class="index-page">
   <div class="page-wrapper">
     <h1 class="three-d-title">🎭 3-Sides Planner</h1>
 
-    <div class="info-row">
-      <img src="relax.png" alt="Relaxing mental health image" class="info-image-large">
-    
-      <div class="info-text">
-        <p style="font-size: 1rem; color: rgb(29, 85, 148); font-weight: bold;">
-          When we or someone we love is living with bipolar disorder, it’s important to pause and ask: <em>What is bipolar?</em>
-        </p>
-      </div>
-    </div>
-    
+   <div class="info-row">
+  <div class="info-text">
+    <p>
+      When we or someone we love is living with bipolar disorder, it’s important to pause and ask: <em>What is bipolar?</em>
+    </p>
+  </div>
+  <img src="relax.png" alt="Relaxing mental health image" class="info-image">
+</div>
 
     <div class="cloud-section touching-sections">      
-      <p style="font-size: 1.0rem; color: black; font-family: 'Open Sans', sans-serif;">
+      <p style="font-size: .9rem; color: black; font-family: 'Open Sans', sans-serif;">
         <strong>3-Sides</strong> represents the emotional shifts of bipolar life: the highs, the lows, and the moments of balance. This planner helps you make sense of it all, one day at a time.
       </p>
     </div>
