@@ -332,7 +332,7 @@ button:hover, .toolkit-entry button:hover {
 }
 
 .info-image {
-  width: 60%;
+  width: 100%;
   max-width: 250px;
   height: auto; /* ✅ This keeps the image naturally proportioned */
   object-fit: cover;
