@@ -19,7 +19,6 @@ html, body {
   overflow-x: hidden; /* 💥 Stops sideways scrolling */
 }
 
-
 /* Animated gradient shift */
 @keyframes backgroundShift {
   0% { background-position: 0% 50%; }
@@ -81,7 +80,6 @@ html, body {
   text-align: center;
   margin-bottom: 2rem;
   font-family: 'Caveat', cursive;
-
 }
 
 /* Heading styles */
