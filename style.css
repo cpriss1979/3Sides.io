@@ -324,11 +324,12 @@ button:hover, .toolkit-entry button:hover {
   flex-direction: row-reverse; /* ✅ this puts image on the RIGHT */
   align-items: stretch;
   justify-content: flex-start;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
   max-width: 600px;
   background: hwb(315 83% 8%);
-  padding: 2rem;
+  padding-right: 0;
+  padding-left: 20;
   box-sizing: border-box;
 }
 
@@ -338,7 +339,7 @@ button:hover, .toolkit-entry button:hover {
   max-width: 250px;   /* Prevents it from getting too huge on large screens */
   height: auto;
   object-fit: cover;
-  border-radius: 1rem;
+  border-radius: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -569,12 +570,4 @@ details summary {
   .info-image {
     max-width: 60px;
   }
-}
-
-.info-image {
-  width: 200px;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
