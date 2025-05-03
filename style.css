@@ -19,7 +19,6 @@ html, body {
   overflow-x: hidden; /* 💥 Stops sideways scrolling */
 }
 
-
 /* Animated gradient shift */
 @keyframes backgroundShift {
   0% { background-position: 0% 50%; }
@@ -404,7 +403,6 @@ button:hover, .toolkit-entry button:hover {
   text-align: center;
 }
 
-
 @keyframes fadeIn {
   to {
     opacity: 1;
@@ -466,7 +464,6 @@ button:hover, .toolkit-entry button:hover {
   box-sizing: border-box;
   border-top: 4px solid #5da9c7; /* Adjust thickness and color as you like */
 }
-
 
 .hero-image {
   width: 100%;
