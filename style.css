@@ -298,7 +298,6 @@ button:hover, .toolkit-entry button:hover {
 }
 
 .cloud-section {
-  background: #e7a7b3; /* soft pastel index.html */
   max-width: 600px;
   color: #2f3b5c;
   text-align: center;
@@ -410,6 +409,80 @@ button:hover, .toolkit-entry button:hover {
   }
 }
 
+.page-header {
+  width: 100%;
+  max-width: 600px;
+  margin: 1rem auto 2rem;
+  text-align: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.tagline {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.1rem;
+  color: #4b6578;
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero-image {
+  width: 100%;
+  max-height: 300px;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+.hero-caption {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1d578a;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+.intro-paragraph p {
+  font-size: 0.95rem;
+  color: #2f3b5c;
+  margin-top: 0;
+}
+
+.image-text-box {
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 1 / 1; /* Perfect square */
+  background: linear-gradient(to bottom, #f3d4f1, #dab9e1, #c9a7d3);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 0; /* Touching the next section */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  max-height: 65%; /* keeps space for caption below */
+  object-fit: contain;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.5rem;
+}
+
+.hero-caption {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1d578a;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+}
+
 /* toolkit.html */
 .affirmation-popup {
   position: fixed;
@@ -419,7 +492,7 @@ button:hover, .toolkit-entry button:hover {
   background: #ffffff;
   color: rgb(20, 20, 170);
   padding: 2rem 4rem;
-  border-radius: 2rem;
+  border-radius: 1.5rem;
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
   font-family: 'Patrick Hand', cursive;
   font-size: 1.2rem;
@@ -494,7 +567,7 @@ details {
   background-color: #ffffffc9;
   border: 2px solid rgba(69, 111, 179, 0.903);
   border-left: 8px solid rgb(15, 46, 131);
-  border-radius: 1rem;
+  border-radius: 1.5rem;
   padding: 0.8rem 1rem;
   margin-bottom: 0.7rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
