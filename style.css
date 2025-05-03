@@ -50,7 +50,6 @@ html, body {
   margin-top: 1.7rem; /* 👈 This adds space at the top */
 }
 
-
 .touching-sections {
   margin-bottom: 0 !important;
   margin-top: 0 !important;
@@ -75,18 +74,17 @@ html, body {
 
 .three-d-title {
   font-size: 2.8rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Patrick Hand', cursive;
   text-align: center;
   margin-bottom: 2rem;
-  color: #7c4d9e; /* pastel plum */
+  color: rgba(168, 119, 190, 0.582); /* pastel plum */
   text-shadow:
-    1px 1px 0 #dac0e8,     /* soft lavender */
+    1px 1px 0 black,     /* soft lavender */
     2px 2px 0 #b36893,     /* rich mauve */
     3px 3px 8px rgba(0, 0, 0, 0.1); /* soft drop shadow */
   letter-spacing: 1px;
   transition: all 0.3s ease;
-}
-
+} 
 
 /* Heading styles */
 h1, h2, h3 {
@@ -453,25 +451,27 @@ button:hover, .toolkit-entry button:hover {
   margin-top: 0;
 }
 
+/* container surrounding image on index.html */
 .image-text-box {
   width: 100%;
   max-width: 600px;
-  aspect-ratio: 1 / 1; /* Perfect square */
-  background: linear-gradient(to bottom, #f3d4f1, #dab9e1, #c9a7d3);
+  background: linear-gradient(to bottom, #cfeeff, #add8e6, #9bc7d9);
   border-radius: 1.5rem;
-  padding: 1.5rem;
+  padding: 1.5rem 1rem 1rem 1rem; /* top, right, bottom, left */
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 0; /* Touching the next section */
+  margin: 0 auto 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   box-sizing: border-box;
+  border-top: 4px solid #5da9c7; /* Adjust thickness and color as you like */
 }
+
 
 .hero-image {
   width: 100%;
   height: auto;
-  max-height: 65%; /* keeps space for caption below */
+  max-height: 35%; /* keeps space for caption below */
   object-fit: contain;
   border-radius: 1.5rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
