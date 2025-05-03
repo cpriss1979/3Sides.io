@@ -353,6 +353,23 @@ button:hover, .toolkit-entry button:hover {
   align-self: stretch;
 }
 
+.image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.info-image {
+  width: 90%;
+  max-width: 400px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+}
+
+
 /* toolkit.html */
 .affirmation-popup {
   position: fixed;
