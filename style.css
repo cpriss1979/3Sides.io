@@ -333,8 +333,9 @@ button:hover, .toolkit-entry button:hover {
   width: 200px;
   height: 100%;
   object-fit: cover;
-  border-radius: 0;
+  border-radius: 1rem; /* or keep 0 if you want sharp corners */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: block;
 }
 
 
@@ -343,8 +344,6 @@ button:hover, .toolkit-entry button:hover {
   display: flex;
   align-items: center; /* center the paragraph vertically */
 }
-
-
 
 .info-row,
 .cloud-section {
@@ -410,13 +409,6 @@ p {
   max-width: 600px;
   box-sizing: border-box;
   overflow-x: hidden;
-}
-
-/* index.html image */
-.info-image {
-  max-width: 100%;
-  height: auto;
-  display: block;
 }
 
 p {
