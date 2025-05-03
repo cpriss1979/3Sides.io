@@ -319,64 +319,38 @@ button:hover, .toolkit-entry button:hover {
 }
 
 /* index.html top container with image */
-.info-row {
+..info-row {
   display: flex;
-  flex-direction: row-reverse;
-  align-items: stretch;
+  align-items: stretch; /* ✅ equal height */
   justify-content: space-between;
-  background: hwb(315 83% 8%); /* your pink background */
-  padding: 1.2rem;
-  box-sizing: border-box;
-  gap: 1rem;
-}
-
-.info-image {
-  width: 40%;
-  max-width: none;
-  height: auto;
-  object-fit: cover;
-  border-radius: 1rem;
-  align-self: stretch; /* ✅ this makes image match text box height */
+  gap: 1.2rem;
+  padding: 2rem;
+  background: hwb(315 83% 8%); /* soft pink */
+  border-radius: 1.2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  min-height: 220px;
 }
 
 .info-text {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 1rem;
-  background: transparent;
-}
-
-.info-row,
-.cloud-section {
-  padding-bottom: 0;
-  padding-top: 0;
-}
-
-.info-row,
-.cloud-section {
-  padding-bottom: 0;
-  padding-top: 0;
-}
-
-.info-row {
-  min-height: 200px; /* or however tall you want it */
+  font-size: 1rem;
+  color: #2f3b5c;
+  text-align: center;
+  line-height: 1.5;
 }
 
 .info-image {
+  width: 50%;
   height: 100%;
-  align-self: stretch;
   object-fit: cover;
-}
-
-.info-text {
-  padding: 1rem;
-}
-
-.info-row {
-  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  align-self: stretch;
 }
 
 /* toolkit.html */
