@@ -321,31 +321,25 @@ button:hover, .toolkit-entry button:hover {
 /* index.html top container with image */
 .info-row {
   display: flex;
-  flex-direction: row-reverse; /* ✅ this puts image on the RIGHT */
-  align-items: stretch;
+  flex-direction: row-reverse;
+  align-items: stretch; /* this is good — keep it */
   justify-content: flex-start;
   gap: 1rem;
   width: 100%;
   max-width: 600px;
   background: hwb(315 83% 8%);
-  padding-right: 0;
-  padding-left: 20;
+  padding: 0;
   box-sizing: border-box;
 }
 
-
 .info-image {
-  width: 60%;         /* Responsive width, makes image larger on wide screens */
-  max-width: 250px;   /* Prevents it from getting too huge on large screens */
-  height: auto;
+  width: 60%;
+  max-width: 250px;
+  height: auto; /* ✅ This keeps the image naturally proportioned */
   object-fit: cover;
-  border-radius: 0;
+  border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.info-image {
-  height: 100%;
-  object-fit: cover;
+  align-self: stretch; /* ✅ Add this line */
 }
 
 .info-text {
@@ -366,6 +360,23 @@ button:hover, .toolkit-entry button:hover {
   padding-top: 0;
 }
 
+.info-row {
+  min-height: 200px; /* or however tall you want it */
+}
+
+.info-image {
+  height: 100%;
+  align-self: stretch;
+  object-fit: cover;
+}
+
+.info-text {
+  padding: 1rem;
+}
+
+.info-row {
+  padding: 2rem;
+}
 
 /* toolkit.html */
 .affirmation-popup {
