@@ -29,7 +29,7 @@ html, body {
 
 /* -------------------- TYPOGRAPHY -------------------- */
 .three-d-title {
-  font-size: 2.5rem; /* or 2.5rem if you want it just slightly smaller */
+  font-size: 3rem; /* or 2.5rem if you want it just slightly smaller */
   font-family: 'Patrick Hand', cursive;
   text-align: center;
   margin-bottom: 2rem;
@@ -40,7 +40,7 @@ html, body {
 } 
 
 h1.three-d-title {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-family: 'Patrick Hand', cursive !important;
   font-weight: bold;
   color: rgb(40, 130, 180);
