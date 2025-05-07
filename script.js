@@ -161,13 +161,13 @@ function printPlan() {
             font-family: Georgia;
             padding: 2rem;
             background: #fffafc;
-            color: #2e2e3a;
+            color:rgb(46, 46, 57);
           }
           h2, h3 {
             color: #b04bb3;
           }
           strong {
-            color: #4a2c2a;
+            color:rgb(207, 125, 225);
           }
           p {
             margin: 0.5rem 0;
@@ -288,4 +288,3 @@ window.onload = function () {
   document.addEventListener('click', enableSound, { once: true });
   document.addEventListener('touchstart', enableSound, { once: true });
 };
-
