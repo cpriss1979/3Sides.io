@@ -275,7 +275,6 @@ function enableSound() {
 }
 
 
-
 // --------------------- ON PAGE LOAD ---------------------
 window.onload = function () {
   if (document.getElementById('savedSupportList')) {
