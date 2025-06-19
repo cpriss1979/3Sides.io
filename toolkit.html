@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style.css"/>
+  <title>My Feel-Good Toolkit</title>
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <div class="torn-paper-divider"></div>
+
+  <div class="page-wrapper">
+    <div class="container">
+    <h1 class="three-d-title">My Feel-Good Toolkit</h1>
+    <div class="torn-paper-divider"></div>
+<br><br><br>
+    <div class="feel-good-container">
+      <h3> Ideas</h3>
+    <button class="dropdown-icon-btn" onclick="toggleFeelGood()">💖</button>
+        <div id="feelGoodList" class="feel-good-content">
+          <table class="feel-good-chart">
+            <tbody>
+              <tr><td>Taking a walk outside</td></tr>
+              <tr><td>Listening to music</td></tr>
+              <tr><td>A hot cup of cocoa in your favorite mug</td></tr>
+              <tr><td>Talk to a friend</td></tr>
+              <tr><td>Journal your thoughts</td></tr>
+              <tr><td>Cuddle with a soft stuffed animal</td></tr>
+              <tr><td>Watch a comforting movie or show</td></tr>
+              <tr><td>Take a bubble bath</td></tr>
+              <tr><td>Light a scented candle</td></tr>
+              <tr><td>Do deep breathing exercises</td></tr>
+              <tr><td>Stretch your body</td></tr>
+              <tr><td>Color in an adult coloring book</td></tr>
+              <tr><td>Read a favorite book</td></tr>
+              <tr><td>Make a gratitude list</td></tr>
+              <tr><td>Drink a glass of cold water</td></tr>
+              <tr><td>Put on comfy clothes or pajamas</td></tr>
+              <tr><td>Dance around your room</td></tr>
+              <tr><td>Look at old happy photos</td></tr>
+              <tr><td>Make a playlist of feel-good songs</td></tr>
+              <tr><td>Use a fidget toy or stress ball</td></tr>
+              <tr><td>Step outside and feel the sun</td></tr>
+              <tr><td>Write a letter to your future self</td></tr>
+              <tr><td>Do a skincare routine</td></tr>
+              <tr><td>Pet an animal (even a neighbor’s dog!)</td></tr>
+              <tr><td>Listen to a positive podcast</td></tr>
+              <tr><td>Do a small craft or creative project</td></tr>
+              <tr><td>Watch funny videos or memes</td></tr>
+              <tr><td>Organize a tiny space (like a drawer)</td></tr>
+              <tr><td>Open a window and breathe deeply</td></tr>
+              <tr><td>Wrap yourself in a weighted blanket</td></tr>
+              <tr><td>Say affirmations out loud</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+<br><br><br>
+      <div class="toolkit-entry">
+        <input type="text" id="newIdea" placeholder="Add your own feel-good idea..." />
+        <br>
+        <button onclick="addIdea()">➕ Add</button>
+      </div>
+      <br><br>
+
+
+      <div class="dreamy-box">
+
+      <p style="text-align: center; font-size: 1.1rem; margin-bottom: 1rem;">
+      <h2>  💕 Your own comforting, grounding, or joyful ideas. 💕 </h2>
+      </p>
+      <div id="toolkitList" class="toolkit-list"></div>
+    </div>
+  </div>
+
+   <footer class="bottom-nav">
+    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
+    <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
+    <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
+    <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
+    <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
+  </footer>
+
+  <script>
+    let toolkit = JSON.parse(localStorage.getItem("feelGoodToolkit")) || [];
+
+    function renderToolkit() {
+      const listDiv = document.getElementById("toolkitList");
+      listDiv.innerHTML = "";
+
+      const ul = document.createElement("ul");
+      ul.classList.add("toolkit-list");
+      listDiv.appendChild(ul);
+
+      toolkit.forEach((idea, index) => {
+        const li = document.createElement("li");
+        li.classList.add("toolkit-item");
+
+        li.innerHTML = `
+          <span>${idea}</span>
+          <button onclick="deleteIdea(${index})" class="delete-button">❌</button>
+        `;
+
+        ul.appendChild(li);
+      });
+    }
+
+    function addIdea() {
+      const newIdeaInput = document.getElementById("newIdea");
+      const newIdea = newIdeaInput.value.trim();
+      if (newIdea !== "") {
+        toolkit.push(newIdea);
+        localStorage.setItem("feelGoodToolkit", JSON.stringify(toolkit));
+        newIdeaInput.value = "";
+        renderToolkit();
+      }
+    }
+
+    function deleteIdea(index) {
+      toolkit.splice(index, 1);
+      localStorage.setItem("feelGoodToolkit", JSON.stringify(toolkit));
+      renderToolkit();
+    }
+
+    function toggleFeelGood() {
+      const list = document.getElementById("feelGoodList");
+      list.style.display = list.style.display === "none" || list.style.display === "" ? "block" : "none";
+    }
+
+    window.onload = renderToolkit;
+  </script>
+</body>
+</html>

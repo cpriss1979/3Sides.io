@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <!-- Main CSS File -->
+        <link rel="stylesheet" href="style.css">
+
+  <title>Letter to Future Me</title>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Open Sans', sans-serif;
+      background: #fdfcdc;
+      color: black;
+    }
+
+    .page-wrapper {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .three-d-title {
+      font-size: 2.5rem;
+      font-family: 'Patrick Hand', cursive;
+      color: rgb(40, 130, 180);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.25);
+      margin-bottom: 1.5rem;
+    }
+
+    .dreamy-box {
+      background: linear-gradient(145deg, #e0f7fa, #fdfcdc);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      border-top: 3px solid rgba(40, 130, 180, 0.2);
+      border-bottom: 3px solid rgba(40, 130, 180, 0.2);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: 1rem;
+      border: 2px solid #90caf9;
+      background: #f0fdfb;
+      font-family: 'Patrick Hand', cursive;
+      resize: vertical;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+        background-color: #468faf;
+        color: white;
+      border: none;
+      border-radius: 0.85rem;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      margin: 0.5rem;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #66bb6a;
+    }
+
+    details {
+      text-align: left;
+      margin-top: 1rem;
+    }
+
+    summary {
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-weight: bold;
+      color: rgb(40, 130, 180);
+    }
+
+    #letterDisplay {
+      animation: fadeInLetter 1.5s ease-in-out;
+      white-space: pre-wrap;
+      font-size: 1.2rem;
+      color: black;
+      font-family: 'Patrick Hand', cursive;
+    }
+
+    @keyframes fadeInLetter {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fafafa;
+  border-top: 1px solid rgba(69, 111, 179, 0.903);
+  display: flex;
+  justify-content: space-around;
+  padding: 0.8rem 0;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.nav-icon {
+  text-decoration: none;
+  color: rgba(69, 111, 179, 0.903);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.nav-icon span {
+  font-size: 0.75rem;
+  margin-top: 0.2rem;
+}
+
+.nav-icon:hover {
+  color: #72aadf;
+}
+
+.page-wrapper {
+  padding-bottom: 6rem; /* ensures divider doesn't get hidden behind nav */
+}
+
+.torn-paper-divider {
+  width: 100%;
+  height: 60px;
+  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 150" xmlns="http://www.w3.org/2000/svg"><path fill="%2389cbd4" fill-opacity="1" d="M0,40 Q80,90 160,40 T320,40 T480,40 T640,40 T800,40 T960,40 T1120,40 T1280,40 T1440,40 L1440,0 L0,0 Z"/></svg>') no-repeat center;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  transform: rotate(180deg); /* optional, depending on your direction */
+}
+.torn-paper-divider {
+  z-index: 1;
+  position: relative;
+}
+
+body {
+  padding-bottom: 6rem; /* make room above fixed footer */
+}
+
+  </style>
+</head>
+<body>
+
+    <div class="torn-paper-divider"></div>
+
+  <div class="page-wrapper dreamy-box">
+    <h2 class="three-d-title">💌 Letter to Future Me</h2>
+
+    <form id="letterForm">
+      <label for="letterInput">Write something comforting or motivational for your future self:</label>
+      <textarea id="letterInput" rows="6" placeholder="Type your message or use the prompts below..."></textarea>
+
+      <div>
+        <button type="button" onclick="saveLetter()">💾 </button>
+    
+      </div>
+
+      <details>
+        <summary>🌈 Need inspiration? Try these prompts</summary>
+        <ul>
+          <li>✨ What has helped you feel stable lately?</li>
+          <li>💪 What are you proud of yourself for?</li>
+          <li>🛠️ What coping tools do you want to remember?</li>
+          <li>💖 What would you want someone you love to hear if they felt this way?</li>
+        </ul>
+      </details>
+    </form>
+    
+    <div id="letterDisplayContainer" class="dreamy-box" style="display:none; margin-top:2rem;">
+      <h3>📝 Your Message to Yourself</h3>
+      <p id="letterDisplay"></p>
+    </div> 
+        <button type="button" onclick="deleteLetter()">🗑️ </button>
+
+</div>
+
+
+<div class="torn-paper-divider"></div>
+
+
+  <footer class="bottom-nav">
+    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
+    <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
+    <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
+    <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
+    <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
+  </footer>
+  
+  <script>
+    // Load letter on page load
+    window.onload = function() {
+      const savedLetter = localStorage.getItem("letterToFutureMe");
+      if (savedLetter) {
+        document.getElementById("letterDisplay").textContent = savedLetter;
+        document.getElementById("letterDisplayContainer").style.display = "block";
+      }
+    };
+
+    function saveLetter() {
+      const letter = document.getElementById("letterInput").value.trim();
+      if (letter === "") {
+        alert("Please write a letter before saving.");
+        return;
+      }
+      localStorage.setItem("letterToFutureMe", letter);
+      document.getElementById("letterDisplay").textContent = letter;
+      document.getElementById("letterDisplayContainer").style.display = "block";
+      document.getElementById("letterInput").value = "";
+    }
+
+    function deleteLetter() {
+      localStorage.removeItem("letterToFutureMe");
+      document.getElementById("letterDisplay").textContent = "";
+      document.getElementById("letterDisplayContainer").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>

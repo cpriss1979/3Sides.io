@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style.css"/>
+  <title>Support People</title>
+  <style>
+    
+  </style>
+</head>
+
+<body class="support-page">
+  <div class="torn-paper-divider"></div>
+
+<div class="container">
+  <br><br>
+  <h1 class="three-d-title">My Support</h1>
+  <p style="text-align: center;">These are the people I trust and can reach out to when I need help, comfort, or grounding.</p>
+
+    <input type="text" id="name" placeholder="Name" />
+    <input type="text" id="relationship" placeholder="Relationship" />
+    <input type="text" id="phone" placeholder="Phone #" />
+
+    <div class="button-row">
+      <button id="saveSupportButton">💾 </button>
+      <button id="printSupportButton">🖨️ </button>
+    </div>
+<br><br><br>
+<div class="torn-paper-divider" style="transform: rotate(180deg);"></div>
+
+<h1 class="three-d-title">📋 My Saved Support List</h1>
+
+      <ul id="savedSupportList"></ul>
+  </div>
+  </div>
+
+   <footer class="bottom-nav">
+    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
+    <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
+    <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
+    <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
+    <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
+  </footer>
+  
+  <!-- 🛠 Load external main JavaScript first -->
+  <script src="script.js"></script>
+
+  <!-- 🛠 Page-specific small script -->
+  <script>
+    function saveSupport() {
+      const name = document.getElementById("name").value.trim();
+      const relationship = document.getElementById("relationship").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!name && !relationship && !phone) return;
+
+      const supportList = JSON.parse(localStorage.getItem("supportPeople")) || [];
+      supportList.push({ name, relationship, phone });
+      localStorage.setItem("supportPeople", JSON.stringify(supportList));
+
+      document.getElementById("name").value = "";
+      document.getElementById("relationship").value = "";
+      document.getElementById("phone").value = "";
+
+      displaySupport();
+    }
+
+    function deleteSupport(index) {
+      const supportList = JSON.parse(localStorage.getItem("supportPeople")) || [];
+      supportList.splice(index, 1);
+      localStorage.setItem("supportPeople", JSON.stringify(supportList));
+      displaySupport();
+    }
+
+    function displaySupport() {
+      const list = JSON.parse(localStorage.getItem("supportPeople")) || [];
+      const ul = document.getElementById("savedSupportList");
+      ul.innerHTML = "";
+
+      list.forEach((person, index) => {
+        const li = document.createElement("li");
+        li.className = "support-item";
+
+        const span = document.createElement("span");
+        span.textContent = `${person.name} (${person.relationship}) ${person.phone}`;
+
+        const button = document.createElement("button");
+        button.textContent = "❌";
+        button.className = "delete-button";
+        button.onclick = () => deleteSupport(index);
+
+        li.appendChild(span);
+        li.appendChild(button);
+        ul.appendChild(li);
+      });
+    }
+
+    function printSupportList() {
+      window.print();
+    }
+
+    // 🌟 COMBINE everything into ONE window.onload
+    window.onload = function() {
+      // Display support list
+      displaySupport();
+      document.getElementById("saveSupportButton").onclick = saveSupport;
+      document.getElementById("printSupportButton").onclick = printSupportList;
+
+      // Setup affirmation trigger after first click
+      document.addEventListener('click', enableSound, { once: true });
+      document.addEventListener('touchstart', enableSound, { once: true });
+    };
+  </script>
+
+</body>
+</html>

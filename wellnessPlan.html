@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Everyday Wellness</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    h3::after {
+  content: "";
+  display: block;
+  width: 60%; /* or 100% if you want it full width */
+  margin: 0.5rem auto 0 auto; /* adjust spacing */
+  border-bottom: 3px solid rgb(40, 130, 180); /* pick your color */
+align: left;
+}
+ strong {
+  color: black;
+ }
+  </style>
+</head>
+
+<body>
+  <div class="torn-paper-divider"></div>
+
+
+      <h1 class="three-d-title">My Mental Health Plan</h1>
+
+      <div class="gradient-section-box2">
+       <form>
+        <div class="container wellness-wrapper">
+        </form>
+  
+          <h3>🌼 Everyday Wellness</h3>
+<br>
+        <label for="wellnessLook" style="display:block; text-align:center;">
+        When I’m at my best, here’s how I feel and show up in the world:
+       <br><br>
+        <textarea id="wellnessLook" placeholder="Describe what you feel like when you're in a good place — your energy, your mood, how you interact with others..."></textarea>
+      </label>
+      <br><br>
+
+      <label for="dailyHabits" style="display:block; text-align:center;">
+        Gentle routines that help me stay well:
+        <br><br>
+        <textarea id="dailyHabits" placeholder="List the daily habits, rituals, or actions that support your wellness — like sleep, meals, movement, connection, or quiet time."></textarea>
+      </label>
+      <br>
+
+      <h3>🌀 When I Feel Off Balance</h3>
+      <br>
+
+      <label for="triggerList" style="display:block; text-align:center;">
+        Things that tend to make life feel harder for me:
+        <br><br>
+        <textarea id="triggerList" placeholder="What situations, patterns, or stressors tend to throw you off — like too much noise, skipping meals, or feeling misunderstood?"></textarea>
+      </label>
+      <br><br>
+
+      <label for="afterTriggered" style="display:block; text-align:center;">
+        What helps me find my footing again:
+        <br><br>
+        <textarea id="afterTriggered" placeholder="Think about what soothes you, grounds you, or helps you feel safe when you’ve been triggered."></textarea>
+      </label>
+      <br>
+
+      <h3>⚠️ Early Warning Signs</h3>
+<br>
+      <label for="triggerList" style="display:block; text-align:center;">
+        How I know something might be shifting:
+        <br><br>
+        <textarea id="warningSigns" placeholder="What signs show up when you're starting to feel off? Changes in sleep, energy, mood, or how you relate to others?"></textarea>
+      </label>
+<br>
+      <h3>🛟 Support Plan</h3>
+
+      <label for="actionPlan" style="display:block; text-align:center;">
+        Ways I can care for myself when I notice those signs:
+        <br><br>
+        <textarea id="actionPlan" placeholder="What helps you slow down, shift, or reset? Write down your go-to coping tools and healing steps."></textarea>
+      </label>
+      <br><br>
+
+      <label for="anotherAction" style="display:block; text-align:center;">
+        How others can support me if I need help:
+               <br><br>
+        <textarea id="anotherAction" placeholder="Be honest about what you might need — gentle reminders, practical help, someone just being there."></textarea>
+      </label>
+
+      <div class="button-row">
+        <button type="button" class="icon-button save-btn" onclick="savePlan()" title="Save Plan">💾</button>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+  <div id="savedPlan" class="saved-section">
+    <h1 class="three-d-title">Saved Plan</h1>
+
+    <h3>🌼 Everyday Wellness</h3>
+    <p><strong>When I’m at my best, here’s how I feel and show up in the world:</strong> <span id="displayWellnessLook"></span></p>
+    <p><strong>Gentle routines that help me stay well:</strong> <span id="displayDailyHabits"></span></p>
+    <br>
+
+    <h3>🌀 When I Feel Off Balance</h3>
+    <p><strong>Things that tend to make life feel harder for me:</strong> <span id="displayTriggerList"></span></p>
+    <p><strong>What helps me find my footing again:</strong> <span id="displayAfterTriggered"></span></p>
+    <br>
+
+    <h3>⚠️ Early Warning Signs</h3>
+    <p><strong>How I know something might be shifting:</strong> <span id="displayWarningSigns"></span></p>
+    <br>
+
+    <h3>🛟 Support Plan</h3>
+    <p><strong>Ways I can care for myself when I notice those signs:</strong> <span id="displayActionPlan"></span></p>
+    <p><strong>How others can support me if I need help:</strong> <span id="displayAnotherAction"></span></p>
+    <br>
+    <div class="button-row">
+      <button type="button" class="icon-button" onclick="printSavedPlanOnly()" title="Print Plan">🖨️</button>
+      <button type="button" class="icon-button" onclick="resetPlan()" title="Reset Plan">🗑️</button>
+  </div>
+
+  <footer class="bottom-nav">
+    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
+    <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
+    <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
+    <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
+    <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
+  </footer>
+  
+  <audio id="chime" src="chime.mp3" preload="auto"></audio>
+  <script src="script.js"></script>
+  
+  <script>
+    function printPlan() {
+      window.print();
+    }
+
+    function resetPlan() {
+      if (confirm("Are you sure you want to reset your wellness plan?")) {
+        const textareas = document.querySelectorAll("textarea");
+        textareas.forEach(area => area.value = "");
+
+        const displayIds = [
+          "displayWellnessLook",
+          "displayDailyHabits",
+          "displayTriggerList",
+          "displayAfterTriggered",
+          "displayWarningSigns",
+          "displayActionPlan",
+          "displayAnotherAction"
+        ];
+
+        displayIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = "";
+        });
+      }
+    }
+
+    function printSavedPlanOnly() {
+      const printContents = document.getElementById("savedPlan").innerHTML;
+      const originalContents = document.body.innerHTML;
+
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload();
+    }
+
+  function savePlan() {
+    const plan = {
+  wellnessLook: document.getElementById("wellnessLook").value,
+  dailyHabits: document.getElementById("dailyHabits").value,
+
+      triggerList: document.getElementById("triggerList").value,
+      afterTriggered: document.getElementById("afterTriggered").value,
+      warningSigns: document.getElementById("warningSigns").value,
+      actionPlan: document.getElementById("actionPlan").value,
+      anotherAction: document.getElementById("anotherAction").value
+    };
+
+    localStorage.setItem("wellnessPlan", JSON.stringify(plan));
+    displaySavedPlan(); // show saved data immediately
+  }
+
+  function displaySavedPlan() {
+    const saved = JSON.parse(localStorage.getItem("wellnessPlan"));
+    if (!saved) return;
+
+    document.getElementById("displayWellnessLook").textContent = saved.wellnessLook;
+    document.getElementById("displayDailyHabits").textContent = saved.dailyHabits;
+    document.getElementById("displayTriggerList").textContent = saved.triggerList;
+    document.getElementById("displayAfterTriggered").textContent = saved.afterTriggered;
+    document.getElementById("displayWarningSigns").textContent = saved.warningSigns;
+    document.getElementById("displayActionPlan").textContent = saved.actionPlan;
+    document.getElementById("displayAnotherAction").textContent = saved.anotherAction;
+  }
+
+  window.onload = function () {
+  displaySavedPlan();
+  affirmation-popup(); // or whatever your affirmation function is called
+};
+
+  </script>
+</body>
+</html>
+
+  <audio id="chime" src="chime.mp3" preload="auto"></audio>
+  <script src="script.js"></script>
+  
+  <script>
+    function printPlan() {
+      window.print();
+    }
+
+    function resetPlan() {
+      if (confirm("Are you sure you want to reset your wellness plan?")) {
+        const textareas = document.querySelectorAll("textarea");
+        textareas.forEach(area => area.value = "");
+
+        const displayIds = [
+          "displayWellnessLook",
+          "displayDailyHabits",
+          "displayTriggerList",
+          "displayAfterTriggered",
+          "displayWarningSigns",
+          "displayActionPlan",
+          "displayAnotherAction"
+        ];
+
+        displayIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = "";
+        });
+      }
+    }
+
+    function printSavedPlanOnly() {
+      const printContents = document.getElementById("savedPlan").innerHTML;
+      const originalContents = document.body.innerHTML;
+
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload();
+    }
+
+  function savePlan() {
+    const plan = {
+  wellnessLook: document.getElementById("wellnessLook").value,
+  dailyHabits: document.getElementById("dailyHabits").value,
+
+      triggerList: document.getElementById("triggerList").value,
+      afterTriggered: document.getElementById("afterTriggered").value,
+      warningSigns: document.getElementById("warningSigns").value,
+      actionPlan: document.getElementById("actionPlan").value,
+      anotherAction: document.getElementById("anotherAction").value
+    };
+
+    localStorage.setItem("wellnessPlan", JSON.stringify(plan));
+    displaySavedPlan(); // show saved data immediately
+  }
+
+  function displaySavedPlan() {
+    const saved = JSON.parse(localStorage.getItem("wellnessPlan"));
+    if (!saved) return;
+
+    document.getElementById("displayWellnessLook").textContent = saved.wellnessLook;
+    document.getElementById("displayDailyHabits").textContent = saved.dailyHabits;
+    document.getElementById("displayTriggerList").textContent = saved.triggerList;
+    document.getElementById("displayAfterTriggered").textContent = saved.afterTriggered;
+    document.getElementById("displayWarningSigns").textContent = saved.warningSigns;
+    document.getElementById("displayActionPlan").textContent = saved.actionPlan;
+    document.getElementById("displayAnotherAction").textContent = saved.anotherAction;
+  }
+
+  window.onload = function () {
+  displaySavedPlan();
+  affirmation-popup(); // or whatever your affirmation function is called
+};
+
+
+      // Setup affirmation trigger after first click
+      document.addEventListener('click', enableSound, { once: true });
+      document.addEventListener('touchstart', enableSound, { once: true });
+  
+  </script>
+</body>
+</html>
+
