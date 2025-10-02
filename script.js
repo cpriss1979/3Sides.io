@@ -221,9 +221,10 @@ function printPlan() {
 /* -------------------------------------------------------
    Affirmations (kept local; no DB needed)
 ------------------------------------------------------- */
-const dingSound = new Audio("chime.mp3");
-dingSound.preload = "auto";
-let soundEnabled = false;
+// --- popup sound disabled (no audio) ---
+// --- Affirmation timing controls (ms) ---
+const AFFIRM_SHOW_MS = 4000;  // how long it stays fully visible before fading
+const AFFIRM_FADE_MS = 800;   // how long the fade-out animation lasts
 
 const affirmations = [
   "You are n🚫t your diagnosis. You are n🚫t a stereotype.",
@@ -260,33 +261,32 @@ const affirmations = [
   "Like a 'bumblebee' is - You're essential, gentle and strong.",
   "'A' is for always, 'B' is for bounceback, 'C' is for can do."
 ];
-
 function showAffirmation() {
   const idx = Math.floor(Math.random() * affirmations.length);
   const message = affirmations[idx];
 
-  if (soundEnabled) {
-    dingSound.currentTime = 0;
-    dingSound.play().catch(() => { });
-  }
+  // (sound is disabled in your module already)
 
   const popup = document.createElement("div");
   popup.className = "affirmation-popup";
   popup.textContent = message;
+
+  // Tell CSS how long to animate (keeps CSS/JS in sync)
+  popup.style.setProperty("--affirm-fade-ms", `${AFFIRM_FADE_MS}ms`);
+
   document.body.appendChild(popup);
 
+  // stay visible for AFFIRM_SHOW_MS, then fade
   setTimeout(() => {
     popup.style.opacity = "0";
-    setTimeout(() => popup.remove(), 1400);
-  }, 1400);
+    // wait for fade to finish, then remove
+    setTimeout(() => popup.remove(), AFFIRM_FADE_MS);
+  }, AFFIRM_SHOW_MS);
 }
 
-function enableSound() {
-  soundEnabled = true;
-  document.removeEventListener("click", enableSound);
-  document.removeEventListener("touchstart", enableSound);
-  showAffirmation();
-}
+
+
+
 
 function createRandomSparkles(containerSelector, sparkleCount = 25) {
   const container = document.querySelector(containerSelector);
@@ -341,10 +341,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (document.getElementById("displayWellnessLook")) {
     displaySavedPlan().catch(() => { });
   }
-
-  // Sound unlock on first gesture
-  document.addEventListener("click", enableSound, { once: true });
-  document.addEventListener("touchstart", enableSound, { once: true });
 
   // Optional sparkle hook for pages that use .dreamy-box
   createRandomSparkles(".dreamy-box", 25);

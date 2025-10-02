@@ -697,6 +697,26 @@ ul.right-align li { color: white; }
 /* ================= register css add ons ================ */
 .legal-footer a { color: #C9BBFF !important; }              /* link color */
 .legal-footer a:hover { text-decoration: underline; filter: brightness(1.12); }
+
+
+/* ================= affirmation popup css ============== */
+/* Affirmation popup */
+  .affirmation-popup{
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%) translateY(16px);
+    min-width: 240px; max-width: 92vw;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(0,0,0,.85);
+    color: #fff;
+    font-weight: 600; font-size: 14px; line-height: 1.35;
+    box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    opacity: 1; transition: opacity .25s ease, transform .25s ease;
+    z-index: 9999; text-align: center;
+  }
+
 </style>
 </head>
 
@@ -760,6 +780,52 @@ ul.right-align li { color: white; }
         <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
         <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
       </footer>
+
+      <!-- Affirmation popup (no sound) -->
+      <script>
+        // Make sure the popup CSS exists (skip if you've already added it in <head>)
+        if (!document.getElementById("affirmation-style")) {
+          const s = document.createElement("style");
+          s.id = "affirmation-style";
+          s.textContent = `
+            .affirmation-popup{
+              position: fixed;
+              left: 50%;
+              bottom: 18px;
+              transform: translateX(-50%) translateY(16px);
+              min-width: 240px; max-width: 92vw;
+              padding: 12px 16px;
+              border-radius: 12px;
+              background: rgba(0,0,0,.85);
+              color: #fff;
+              font-weight: 600; font-size: 14px; line-height: 1.35;
+              box-shadow: 0 6px 20px rgba(0,0,0,.25);
+              opacity: 1; transition: opacity .25s ease, transform .25s ease;
+              z-index: 9999; text-align: center;
+            }`;
+          document.head.appendChild(s);
+        }
+
+      </script>
+      
+      <!-- Load your existing popup logic -->
+      <script type="module" src="script.js"></script>
+      
+      <!-- Trigger one popup on page open (iOS-safe) -->
+      <script>
+        (function () {
+          const kickoff = () => {
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+              try { window.showAffirmation && window.showAffirmation(); } catch { }
+            }));
+          };
+          if (document.readyState === "complete" || document.readyState === "interactive") {
+            setTimeout(kickoff, 450);
+          } else {
+            document.addEventListener("DOMContentLoaded", () => setTimeout(kickoff, 450), { once: true });
+          }
+        })();
+      </script>
 
       <!-- ================== page script ================= -->
       <script type="module">

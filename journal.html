@@ -35,7 +35,7 @@
       })();
     })();
   </script>
-  
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>3-Sides Planner — JOURNAL</title>
@@ -47,7 +47,7 @@
   <script type="module">
     import './firebase-init.js'; // ensures app/auth/db are initialized
   </script>
-    
+
   <!-- 1) FOUC guard -->
   <style>
     html:not([data-ready="1"]) {
@@ -71,13 +71,13 @@
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#6a5acd">
   <meta name="color-scheme" content="dark light">
-  
+
   <!-- Favicons -->
   <link rel="icon" type="image/svg+xml" sizes="any" href="/3-sides-planner.io/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/3-sides-planner.io/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/3-sides-planner.io/favicon-16.png">
   <link rel="apple-touch-icon" href="/3-sides-planner.io/icon-192.png"> <!-- iOS Home screen -->
-  
+
   <!-- Fonts & CSS (non-blocking) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -575,56 +575,107 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
-/* ================== bottom-nav for navbar ================ */
-/* Full-height layout + bottom space for footer */
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            box-sizing: border-box;
-            width: 100%;
-            padding-bottom: 4rem;
-            /* room for bottom nav */
-        }
+    /* ================== bottom-nav for navbar ================ */
+    /* Full-height layout + bottom space for footer */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      width: 100%;
+      padding-bottom: 4rem;
+      /* room for bottom nav */
+    }
 
-/* ===================== update - text color, in container - to black ================= */
-/* Form fields: force readable black text across Chrome & Safari */
-input, textarea, select, [contenteditable="true"] {
-  color: #111 !important;             /* normal text */
-  -webkit-text-fill-color: #111 !important; /* WebKit inner text (Chrome/Safari) */
-  caret-color: #111;                  /* cursor color */
-  background-color: #f6dff1;          /* your light pink; tweak if needed */
-}
+    /* ===================== update - text color, in container - to black ================= */
+    /* Form fields: force readable black text across Chrome & Safari */
+    input,
+    textarea,
+    select,
+    [contenteditable="true"] {
+      color: #111 !important;
+      /* normal text */
+      -webkit-text-fill-color: #111 !important;
+      /* WebKit inner text (Chrome/Safari) */
+      caret-color: #111;
+      /* cursor color */
+      background-color: #f6dff1;
+      /* your light pink; tweak if needed */
+    }
 
-/* Placeholders (Safari needs explicit color + opacity=1 to show) */
-input::placeholder,
-textarea::placeholder {
-  color: rgba(0,0,0,.55);
-  opacity: 1;
-}
+    /* Placeholders (Safari needs explicit color + opacity=1 to show) */
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(0, 0, 0, .55);
+      opacity: 1;
+    }
 
-/* Autofill (prevents Chrome’s yellow + keeps text black) */
-input:-webkit-autofill,
-textarea:-webkit-autofill,
-select:-webkit-autofill {
-  -webkit-text-fill-color: #111 !important;
-  box-shadow: 0 0 0px 1000px #f6dff1 inset;  /* match background */
-  transition: background-color 9999s ease-in-out 0s; /* suppress flash */
-}
+    /* Autofill (prevents Chrome’s yellow + keeps text black) */
+    input:-webkit-autofill,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+      -webkit-text-fill-color: #111 !important;
+      box-shadow: 0 0 0px 1000px #f6dff1 inset;
+      /* match background */
+      transition: background-color 9999s ease-in-out 0s;
+      /* suppress flash */
+    }
 
-/* ================= register css add ons ================ */
-  .legal-footer {
-    text-align: center;
-    font-size: 0.9rem;
-    margin-top: 8px;
-    color: var(--text-color) !important; /* NEW: match theme text color */
-  }
-  .legal-footer a {
-    color: inherit;                 /* NEW: use same color as parent */
-    text-decoration: underline;
-  }
+    /* ================= register css add ons ================ */
+    .legal-footer {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 8px;
+      color: var(--text-color) !important;
+      /* NEW: match theme text color */
+    }
+
+    .legal-footer a {
+      color: inherit;
+      /* NEW: use same color as parent */
+      text-decoration: underline;
+    }
   </style>
+
+<style id="affirmation-style">
+  .affirmation-popup {
+    position: fixed !important;
+    left: 50% !important;
+    bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+    top: auto !important;
+    /* ← cancel any top:0 */
+    right: auto !important;
+    /* ← cancel any right:0 */
+    transform: translateX(-50%) translateY(16px) !important;
+
+    display: inline-block !important;
+    width: auto !important;
+    min-width: 240px !important;
+    max-width: 92vw !important;
+    height: auto !important;
+    /* don’t stretch */
+    max-height: none !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+
+    padding: 12px 16px !important;
+    border-radius: 12px !important;
+    background: rgba(0, 0, 0, .85) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+    text-align: center !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .25) !important;
+
+    pointer-events: none !important;
+    opacity: 1 !important;
+    transition: opacity .25s, transform .25s !important;
+    z-index: 100000 !important;
+  }
+</style>
+
 </head>
 
 <body>
@@ -638,14 +689,14 @@ select:-webkit-autofill {
 
     <div class="entry-list" id="journalEntries"></div>
     <div class="feel-good-container">
-      <textarea id="journalEntry" placeholder="Write your thoughts here..."></textarea>  
+      <textarea id="journalEntry" placeholder="Write your thoughts here..."></textarea>
 
       <div id="petUnlockedMsg" style="display:none;margin-top:8px;font-weight:700;">
         Nice journaling! You can feed your pet today 🐾
       </div>
-      
- <br>
-      
+
+      <br>
+
       <button id="saveBtn" onclick="saveJournalEntry()" class="icon-button">💾 Save</button>
       <a href="pet.html"><button class="icon-button">🐾 My Pet</button></a>
       <br><br><br>
@@ -976,7 +1027,54 @@ select:-webkit-autofill {
       });
       window.addEventListener("focus", flushOutbox);
     </script>
-     
-  </body>
+
+<!-- Affirmation popup logic (same file used on letter.html) -->
+<script type="module" src="script.js"></script>
+
+<!-- Trigger one popup on page open (iOS-safe timing) and re-home it to <body> -->
+  <script>
+    (function () {
+      function placePopupAtBody() {
+        document.querySelectorAll('.affirmation-popup').forEach(el => {
+          if (el.parentNode !== document.body) document.body.appendChild(el);
+          Object.assign(el.style, {
+            position: 'fixed',
+            left: '50%',
+            right: 'auto',                   // ← important
+            top: 'auto',                     // ← important
+            bottom: 'calc(18px + env(safe-area-inset-bottom))',
+            transform: 'translateX(-50%) translateY(16px)',
+            width: 'auto',
+            height: 'auto',
+            maxWidth: '92vw',
+            pointerEvents: 'none',
+            zIndex: 100000
+          });
+        });
+      }
+
+      const kickoff = () => {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          try {
+            if (window.showAffirmation) {
+              window.showAffirmation();
+              setTimeout(placePopupAtBody, 0);
+            }
+          } catch { }
+        }));
+      };
+
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        setTimeout(kickoff, 450);
+      } else {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(kickoff, 450), { once: true });
+      }
+
+      new MutationObserver(placePopupAtBody)
+        .observe(document.documentElement, { childList: true, subtree: true });
+    })();
+  </script>
+  
+</body>
 
 </html>
