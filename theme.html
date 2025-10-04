@@ -64,6 +64,9 @@
   <!-- Register SW without blocking first paint -->
   <script src="sw-register.js" defer></script>
 
+  <!-- Optional: load the module globally too -->
+  <script type="module" src="./badges.js"></script>
+
   <!-- Favicons -->
   <link rel="icon" type="image/svg+xml" sizes="any" href="/3-sides-planner.io/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/3-sides-planner.io/favicon-32.png">
@@ -539,116 +542,122 @@ padding: 10px 20px;
   View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.
 </div>
 
-    <script type="module">
-      import { auth, db } from "./firebase-init.js";
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<script type="module">
+  import { auth, db } from "./firebase-init.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { Badges } from "./badges.js";  // ⬅️ NEW: shared badge API
 
-      // --- Account panel elements (bottom of page) ---
-      const panel = document.getElementById('accountPanel');
-      const emailEl = document.getElementById('acctEmail');
+  // --- Account panel elements (bottom of page) ---
+  const panel = document.getElementById('accountPanel');
+  const emailEl = document.getElementById('acctEmail');
 
-      // Show page
-      const show = () => { document.documentElement.style.visibility = "visible"; };
+  // Show page
+  const show = () => { document.documentElement.style.visibility = "visible"; };
 
-      // Slug helper for class names
-      const slug = k => String(k).trim().toLowerCase().replace(/\s+/g, "-");
+  // Slug helper for class names
+  const slug = k => String(k).trim().toLowerCase().replace(/\s+/g, "-");
 
-      // Local cache (for offline/slow Firestore)
-      const LOCAL_KEY = "lastThemeClass";
+  // Local cache (for offline/slow Firestore)
+  const LOCAL_KEY = "lastThemeClass";
 
-      // Swap ONLY the theme-* class, keep anything else on <html>
-      function applyThemeClass(themeClass) {
-        const root = document.documentElement;
-        const next = themeClass || "theme-original";
-        const keep = (root.className || "")
-          .split(/\s+/).filter(Boolean)
-          .filter(c => !c.startsWith("theme-"));
-        root.className = [...keep, next].join(" ");
-      }
+  // Swap ONLY the theme-* class, keep anything else on <html>
+  function applyThemeClass(themeClass) {
+    const root = document.documentElement;
+    const next = themeClass || "theme-original";
+    const keep = (root.className || "")
+      .split(/\s+/).filter(Boolean)
+      .filter(c => !c.startsWith("theme-"));
+    root.className = [...keep, next].join(" ");
+  }
 
-      // Save + live preview; works with your existing onclick="setTheme('name')"
-      async function saveTheme(themeKey) {
-        const u = auth.currentUser;
-        if (!u) {
-          // Not logged in — bounce to login, come back here
-          location.replace("login.html?next=theme.html");
-          return;
-        }
-        const cls = `theme-${slug(themeKey)}`;
+  // Save + live preview; works with your existing onclick="setTheme('name')"
+  async function saveTheme(themeKey) {
+    const u = auth.currentUser;
+    if (!u) {
+      // Not logged in — bounce to login, come back here
+      location.replace("login.html?next=theme.html");
+      return;
+    }
+    const cls = `theme-${slug(themeKey)}`;
 
-        // Optimistic UI so you see it immediately
-        applyThemeClass(cls);
-        try {
-          await setDoc(doc(db, "users", u.uid), { themeClass: cls }, { merge: true });
-          localStorage.setItem(LOCAL_KEY, cls);
-        } catch (e) {
-          console.warn("[theme] setDoc failed (offline or rules). Using local cache for now.", e);
-          localStorage.setItem(LOCAL_KEY, cls);
-        }
-      }
+    // Optimistic UI so you see it immediately
+    applyThemeClass(cls);
 
-      // Keep legacy onclick hooks working
-      window.setTheme = saveTheme;
-      window.saveTheme = saveTheme;
+    try {
+      await setDoc(doc(db, "users", u.uid), { themeClass: cls }, { merge: true });
+      localStorage.setItem(LOCAL_KEY, cls);
+    } catch (e) {
+      console.warn("[theme] setDoc failed (offline or rules). Using local cache for now.", e);
+      localStorage.setItem(LOCAL_KEY, cls);
+      // still fine; pet.html and badge wall will read local + sync later
+    } finally {
+      // ⬅️ NEW: Award the badge (writes local immediately, Firestore when possible)
+      try { await Badges.award("themeChange"); } catch (e) { console.warn("award themeChange:", e); }
+    }
+  }
 
-      // Subscribe to user doc → keep page theme in sync + toggle account panel
-      let unsub = null;
-      onAuthStateChanged(auth, (u) => {
-        // Clean up old listener if any
-        unsub?.(); unsub = null;
+  // Keep legacy onclick hooks working
+  window.setTheme = saveTheme;
+  window.saveTheme = saveTheme;
 
-        if (!u) {
-          // Hide account panel for signed-out users and redirect
-          if (panel) panel.hidden = true;
-          location.replace("login.html?next=theme.html");
-          return;
-        }
+  // Subscribe to user doc → keep page theme in sync + toggle account panel
+  let unsub = null;
+  onAuthStateChanged(auth, (u) => {
+    // Clean up old listener if any
+    unsub?.(); unsub = null;
 
-        // Signed in: show account panel and email if present
-        if (panel) {
-          if (emailEl) emailEl.textContent = u.email || 'Account';
-          panel.hidden = false;
-        }
+    if (!u) {
+      // Hide account panel for signed-out users and redirect
+      if (panel) panel.hidden = true;
+      location.replace("login.html?next=theme.html");
+      return;
+    }
 
-        let first = true;
+    // Signed in: show account panel and email if present
+    if (panel) {
+      if (emailEl) emailEl.textContent = u.email || 'Account';
+      panel.hidden = false;
+    }
 
-        // Safari safety: if Firestore is slow, show after 2s using cached theme
-        const slowTimer = setTimeout(() => {
-          if (first && auth.currentUser) {
-            const cached = localStorage.getItem(LOCAL_KEY) || "theme-original";
-            applyThemeClass(cached);
-            show();
-          }
-        }, 2000);
+    let first = true;
 
-        unsub = onSnapshot(
-          doc(db, "users", u.uid),
-          (snap) => {
-            clearTimeout(slowTimer);
-            const cls = snap.exists()
-              ? (snap.data().themeClass || "theme-original")
-              : "theme-original";
-            applyThemeClass(cls);
-            localStorage.setItem(LOCAL_KEY, cls);
-            if (first) { show(); first = false; }
-          },
-          (err) => {
-            clearTimeout(slowTimer);
-            console.error("[theme] snapshot error:", err);
-            const cached = localStorage.getItem(LOCAL_KEY) || "theme-original";
-            applyThemeClass(cached);
-            show();
-          }
-        );
-      }, (err) => {
-        console.error("[theme] onAuthStateChanged error:", err);
-        // Fail-safe: show cached theme so page isn’t blank forever
+    // Safari safety: if Firestore is slow, show after 2s using cached theme
+    const slowTimer = setTimeout(() => {
+      if (first && auth.currentUser) {
         const cached = localStorage.getItem(LOCAL_KEY) || "theme-original";
         applyThemeClass(cached);
         show();
-      });
-    </script>
+      }
+    }, 2000);
+
+    unsub = onSnapshot(
+      doc(db, "users", u.uid),
+      (snap) => {
+        clearTimeout(slowTimer);
+        const cls = snap.exists()
+          ? (snap.data().themeClass || "theme-original")
+          : "theme-original";
+        applyThemeClass(cls);
+        localStorage.setItem(LOCAL_KEY, cls);
+        if (first) { show(); first = false; }
+      },
+      (err) => {
+        clearTimeout(slowTimer);
+        console.error("[theme] snapshot error:", err);
+        const cached = localStorage.getItem(LOCAL_KEY) || "theme-original";
+        applyThemeClass(cached);
+        show();
+      }
+    );
+  }, (err) => {
+    console.error("[theme] onAuthStateChanged error:", err);
+    // Fail-safe: show cached theme so page isn’t blank forever
+    const cached = localStorage.getItem(LOCAL_KEY) || "theme-original";
+    applyThemeClass(cached);
+    show();
+  });
+</script>
     
   </body>
   </html>

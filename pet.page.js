@@ -343,7 +343,6 @@ export async function bootPetPage({ firestore, auth, user }) {
         { id: "themeChange", label: "Changed Theme", emoji: "🎨", hue: 280 },
         { id: "feelgood1", label: "1 Feel-Good Idea", emoji: "💡", hue: 50 },
         { id: "firstJournal", label: "First Journal", emoji: "📝", hue: 300 },
-        { id: "wellnessPlan1", label: "Wellness Plan Created", emoji: "🧭", hue: 160 },
         { id: "letter1", label: "Letter to Future Me", emoji: "💌", hue: 340 },
         { id: "pawprint", label: "First Pet Care", emoji: "🐰", hue: 85 },
         { id: "flower", label: "1 Week", emoji: "🌸", hue: 330 },

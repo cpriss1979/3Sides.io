@@ -124,6 +124,10 @@
   <script src="sw-register.js" defer></script>
   <script type="module" src="auth.js"></script>
 
+  <!-- Optional: load the module globally too -->
+  <script type="module" src="./badges.js"></script>
+
+
   <!-- =================== Page-local styles continue here ================= -->
   <style>
     html,
@@ -981,6 +985,7 @@ input, textarea, select {
       query, orderBy, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { initOutbox, queueOrWrite, flushOutbox } from "./outbox.js";  // ⬅️ include flushOutbox for "Synced!" toast
+    import { Badges } from "./badges.js";  // ⬅️ NEW: shared badge API
 
     /* ---------- Tiny toast UI (auto-injected) ---------- */
     function ensureToastUI() {
@@ -1144,6 +1149,18 @@ input, textarea, select {
       });
     }
 
+    // ⬇️ NEW: award helper — grants feelgood1 only if not already earned
+    async function maybeAwardFirstIdea() {
+      try {
+        const all = await Badges.getAll();
+        if (!all.earned?.includes("feelgood1")) {
+          await Badges.award("feelgood1");
+        }
+      } catch (e) {
+        console.warn("[toolkit] award feelgood1 failed (will be fine later):", e);
+      }
+    }
+
     async function addIdea() {
       if (!uid) { location.replace("login.html?next=" + encodeURIComponent(here)); return; }
       const text = (inputEl?.value || "").trim();
@@ -1158,6 +1175,7 @@ input, textarea, select {
         } else {
           showToast("Saved");
         }
+        await maybeAwardFirstIdea();   // ⬅️ NEW
       } catch (err) {
         console.error("[toolkit] addIdea failed:", err);
         alert("Couldn't save that idea. Please try again.");
@@ -1187,6 +1205,7 @@ input, textarea, select {
         } else {
           showToast("Saved");
         }
+        await maybeAwardFirstIdea();   // ⬅️ NEW
       } catch (err) {
         console.error("[toolkit] add from list failed:", err);
         alert("Couldn't add that item. Please try again.");
@@ -1284,8 +1303,8 @@ input, textarea, select {
     setTimeout(() => {
       if (document.documentElement.getAttribute("data-ready") !== "1") reveal();
     }, 1200);
-  </script>  
-  
+  </script>
+
 </body>
 
 </html>

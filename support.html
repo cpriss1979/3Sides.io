@@ -603,9 +603,6 @@ background-color: rgb(221, 151, 221);
       if (cached) applyThemeClass(cached);
     })();
 
-    // One-time chime unlock on first gesture (optional)
-    function enableSound() { new Audio("chime.mp3").play().catch(() => { }); }
-
     /* =========================================================
        Offline "pending" queue (localStorage, per-user)
        - We DO NOT write to Firestore while offline
@@ -776,9 +773,6 @@ background-color: rgb(221, 151, 221);
       $("supportForm")?.addEventListener("submit", handleSaveSupport);
       $("printSupportButton")?.addEventListener("click", printSupportList);
 
-      // Sound unlock
-      document.addEventListener("click", enableSound, { once: true });
-      document.addEventListener("touchstart", enableSound, { once: true });
     });
 
     /* =========================================================

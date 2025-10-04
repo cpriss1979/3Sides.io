@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+s<!DOCTYPE html>
 <html lang="en" class="pet-page" data-ready="0">
 
 <head>
@@ -1071,24 +1071,25 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
   </footer>
 
   <!-- =================== PAGE SCRIPT =================== -->
+  <!-- =================== PAGE SCRIPT (final) =================== -->
   <script type="module">
     import { auth } from "./firebase-init.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // ----- Mini toast UI (auto-injected) -----
+    /* ---------- Tiny toast UI ---------- */
     (function ensureToastUI() {
       if (!document.getElementById("toast-style")) {
         const s = document.createElement("style");
         s.id = "toast-style";
         s.textContent = `
-            .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(16px);
-              min-width:240px;max-width:92vw;padding:12px 16px;border-radius:12px;background:rgba(0,0,0,.85);
-              color:#fff;font-weight:600;font-size:14px;line-height:1.35;box-shadow:0 6px 20px rgba(0,0,0,.25);
-              opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:9999}
-            .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-            .toast .small{display:block;font-weight:500;opacity:.85;margin-top:4px}
-            [data-offline="1"]{opacity:.6;filter:grayscale(.25)}
-          `;
+          .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(16px);
+            min-width:240px;max-width:92vw;padding:12px 16px;border-radius:12px;background:rgba(0,0,0,.85);
+            color:#fff;font-weight:600;font-size:14px;line-height:1.35;box-shadow:0 6px 20px rgba(0,0,0,.25);
+            opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:9999}
+          .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+          .toast .small{display:block;font-weight:500;opacity:.85;margin-top:4px}
+          [data-offline="1"]{opacity:.6;filter:grayscale(.25)}
+        `;
         document.head.appendChild(s);
       }
       if (!document.getElementById("appToast")) {
@@ -1109,29 +1110,25 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
       clearTimeout(showToast._t);
       showToast._t = setTimeout(() => el.classList.remove("show"), 2400);
     }
-    window.__showToast = showToast; // optional for pet.page.js reuse
+    window.__showToast = showToast; // optional reuse
 
-    // Reveal helper
+    /* ---------- Reveal helper ---------- */
     const reveal = () => document.documentElement.setAttribute("data-ready", "1");
 
-    // ---------- helpers to decide what's navigation vs. action ----------
+    /* ---------- Link/action classification ---------- */
     function isInternalPageLink(a) {
       if (!a || a.tagName !== "A") return false;
       const href = a.getAttribute("href") || "";
       try {
         const u = new URL(href, location.href);
-        // allow same-origin navigations (e.g., journal.html, toolkit-hub.html, etc.)
-        // your SW precaches these, so they work offline.
         const sameOrigin = u.origin === location.origin;
         const isPage = /\.html(?:[#?].*)?$/i.test(u.pathname) || u.pathname === "/" || href.startsWith("#");
         const isTelMail = /^mailto:|^tel:/i.test(href);
         return sameOrigin && isPage && !isTelMail;
       } catch {
-        // relative like "journal.html" also lands here as OK
         return /\.html(?:[#?].*)?$/.test(href) || href === "" || href.startsWith("#");
       }
     }
-
     function isActionControl(el) {
       if (!el) return false;
       const tag = el.tagName;
@@ -1140,21 +1137,16 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
         const type = (el.getAttribute("type") || "").toLowerCase();
         return type === "button" || type === "submit";
       }
-      if (el.getAttribute && el.getAttribute("role") === "button") return true;
-      return false;
+      return el.getAttribute?.("role") === "button";
     }
 
-    // ===== OFFLINE GUARD =====
-    // We ONLY disable true "actions". All anchors keep working so users can navigate to journal.html etc.
+    /* ---------- Offline guard ---------- */
     function setOfflineState(isOffline) {
-      // Mark action controls for a visual hint; do not touch anchors.
       document.querySelectorAll('button, input[type="button"], input[type="submit"], [role="button"]').forEach(btn => {
-        // If the button is inside a same-origin page link (e.g., <a href="journal.html"><button>…</button></a>)
-        // we want navigation to keep working offline, so do NOT disable it.
         const wrapperLink = btn.closest("a[href]");
         if (wrapperLink && isInternalPageLink(wrapperLink)) {
           btn.removeAttribute("data-offline");
-          btn.disabled = false; // ensure it doesn't block the anchor
+          btn.disabled = false;
           return;
         }
         if (isOffline) {
@@ -1162,24 +1154,15 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
           btn.disabled = true;
         } else {
           btn.removeAttribute("data-offline");
-          // only re-enable if we were the ones who disabled it
           if (btn.disabled) btn.disabled = false;
         }
       });
     }
-
-    // Capture clicks BEFORE inline onclicks fire; block actions while offline,
-    // but **allow** internal page links (including button-inside-anchor).
     function installGlobalOfflineClickTrap() {
       document.addEventListener("click", (e) => {
         if (navigator.onLine) return;
-
         const a = e.target.closest?.("a[href]");
-        if (a && isInternalPageLink(a)) {
-          // allow navigation to journal.html, toolkit-hub.html, wellness, etc. even while offline
-          return;
-        }
-
+        if (a && isInternalPageLink(a)) return;
         const ctl = e.target.closest?.('button, [role="button"], input[type="button"], input[type="submit"]');
         if (ctl && isActionControl(ctl)) {
           e.preventDefault();
@@ -1187,9 +1170,8 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
           e.stopPropagation();
           showToast("You’re offline", "Actions are disabled. You can still browse.");
         }
-      }, true); // capture
+      }, true);
     }
-
     function wireGlobalOfflineGuard() {
       installGlobalOfflineClickTrap();
       setOfflineState(!navigator.onLine);
@@ -1197,7 +1179,7 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
       window.addEventListener("offline", () => { setOfflineState(true); showToast("You’re offline", "Actions are disabled. You can still browse."); });
     }
 
-    // SW Background Sync → friendly nudge (pet.page.js onSnapshot will update UI)
+    /* ---------- SW background-sync nudge ---------- */
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.addEventListener("message", (ev) => {
         if (ev.data && ev.data.type === "SYNC_OUTBOX") {
@@ -1206,7 +1188,7 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
       });
     }
 
-    // Auth + lazy Firestore + your pet logic
+    /* ---------- Auth + boot pet.page.js ---------- */
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         const next = encodeURIComponent(location.pathname + location.search + location.hash);
@@ -1216,12 +1198,25 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
 
       reveal();
 
+      // Lazy Firestore for faster first paint
       const {
         doc, getDoc, setDoc, updateDoc, onSnapshot, deleteDoc,
         collection, serverTimestamp, increment, runTransaction,
         arrayUnion, getDocs
       } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
 
+      // OPTIONAL: keep the localStorage badge cache in sync with Firestore (prevents stale LS from lighting tiles elsewhere)
+      try {
+        const uid = user.uid;
+        const rootSnap = await getDoc(doc((await import("./firebase-init.js")).db, "users", uid));
+        const rootBadges = Array.isArray(rootSnap.data()?.badges) ? rootSnap.data().badges : [];
+        const sub = await getDocs(collection((await import("./firebase-init.js")).db, "users", uid, "badges"));
+        const subBadges = sub.docs.map(d => d.id);
+        const merged = [...new Set([...rootBadges, ...subBadges])];
+        try { localStorage.setItem(`badges:${uid}`, JSON.stringify({ earned: merged })); } catch { }
+      } catch { /* non-fatal */ }
+
+      // Boot the page logic (builds badge wall, handles feed/water/bath, etc.)
       const { bootPetPage } = await import("./pet.page.js");
       bootPetPage({
         firestore: {
@@ -1229,13 +1224,14 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
           collection, serverTimestamp, increment, runTransaction,
           arrayUnion, getDocs
         },
-        auth, user
+        auth,
+        user
       });
 
       // After UI exists, enforce offline behavior across the whole page
       wireGlobalOfflineGuard();
     });
   </script>
-  
+
 </body>
 </html>
