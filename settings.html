@@ -374,6 +374,12 @@
   color: #111;                /* keep text readable */
 }
 
+#currentPw2,
+#newPw2 {
+  background-color: #e0e0e0;  /* light/medium grey */
+  color: #111;                /* keep text readable */
+}
+
 /* Stack the links in Preferences */
 .prefs a { 
   display: block; 
@@ -395,8 +401,6 @@
 
 /* put space between stacked buttons */
 .btn-wide + .btn-wide { margin-top: 10px; }
-
-
 
 /* === Normalize section headings === */
 .card h2{
@@ -438,6 +442,24 @@
   font-weight: 800 !important;
   margin: 0 0 10px !important;
 }
+
+button:disabled { opacity: .6; cursor: not-allowed; }
+
+/* ================ colors + spacing for pw status ================= */
+.pw-status{
+  margin-top: 6px;
+  font-size: .95rem;
+}
+.pw-status.is-error{ color: #b00020; }   /* red */
+.pw-status.is-ok{ color: #15803d; }      /* green */
+.pw-status.is-hint{ color: #555; }       /* neutral */
+
+/* ======================= status colors =============== */
+.pw-status { margin-top:8px; font-size:.95rem; }
+.pw-status.is-hint { color:#555; }
+.pw-status.is-error { color:#b00020; } /* red */
+.pw-status.is-ok { color:#15803d; }    /* green */
+
     </style>
 
     <!-- Initialize Firebase for this page -->
@@ -446,8 +468,7 @@
     </script>
 
 <body>
-
-    <br>
+ <br>
     <main>
         <div class="page-intro">
             <h1>Settings</h1>
@@ -500,16 +521,26 @@
                 <input id="pwUser" name="username" type="email" autocomplete="username" tabindex="-1" aria-hidden="true"
                     style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;border:0;padding:0;margin:0;" />
 
-                <label for="currentPw">Change password (re-auth required)</label>
-                <input id="currentPw" type="password" placeholder="Current password" autocomplete="current-password" />
-                <input id="newPw" type="password" placeholder="New password (min 6 chars)" autocomplete="new-password"
-                    style="margin-top:8px;" />
-                <div class="row" style="margin-top:8px;">
-                    <button id="changePw" class="btn" type="button">Change password</button>
+                    <label for="currentPw">Change password (re-auth required)</label>
+                    <input id="currentPw" type="password" placeholder="Current password" autocomplete="current-password" />
+                    
+                    <input id="newPw" type="password" placeholder="New password (min 6 chars)" autocomplete="new-password"
+                        style="margin-top:8px;" />
+                    
+                    <!-- NEW: confirm new password -->
+                    <input id="newPw2" type="password" placeholder="Confirm new password" autocomplete="new-password"
+                        style="margin-top:8px;" />
+                    
+                    <div class="row" style="margin-top:8px;">
+                        <!-- was: type="button" -->
+                        <button id="changePw" class="btn" type="submit" disabled>Change password</button>
                 </div>
+
+                <!-- status line just below the button -->
+                <div id="pwStatus" class="pw-status" role="status" aria-live="polite"></div>
+            
             </form>
 
-            <div id="pwStatus" class="status"></div>
         </section>
 
         <!-- Preferences (optional quick links) -->
@@ -534,186 +565,246 @@
         </section>
     </main>
 
-    <!-- Glue: submit → reuse existing click handler -->
-    <script>
-        document.getElementById('pwForm')?.addEventListener('submit', function (e) {
-            e.preventDefault();
-            document.getElementById('changePw')?.click();
-        });
-    </script>
+    <script type="module">
+        import { auth } from './firebase-init.js';
+        import {
+            onAuthStateChanged,
+            signOut,
+            EmailAuthProvider,
+            reauthenticateWithCredential,
+            updatePassword,
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  
-<script type="module">
-    import { auth } from './firebase-init.js';
-    import {
-        onAuthStateChanged,
-        signOut,
-        EmailAuthProvider,
-        reauthenticateWithCredential,
-        updatePassword,
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        // --- guards / state ---
+        let __pwFlow = false;
+        let __stickyErr = null; // { kind:'wrong-current', atValue:'...' }
 
-    // --- redirect guard while changing password ---
-    let __pwFlow = false;
+        // --- DOM ---
+        const headerRight = document.getElementById('headerRight'); // optional
+        const emailEl = document.getElementById('email');
+        const uidEl = document.getElementById('uid');
+        const providerEl = document.getElementById('provider');
 
-    // ---------- DOM ----------
-    const headerRight = document.getElementById('headerRight'); // optional
-    const emailEl = document.getElementById('email');
-    const uidEl = document.getElementById('uid');
-    const providerEl = document.getElementById('provider');
+        const logoutBtn = document.getElementById('logoutBtn');
 
-    const logoutBtn = document.getElementById('logoutBtn');
+        const pwForm = document.getElementById('pwForm');
+        const currentPw = document.getElementById('currentPw');
+        const newPw = document.getElementById('newPw');
+        const newPw2 = document.getElementById('newPw2'); // confirm
+        const changePw = document.getElementById('changePw'); // submit button
+        const pwStatus = document.getElementById('pwStatus');
 
-    const currentPw = document.getElementById('currentPw');
-    const newPw = document.getElementById('newPw');
-    const changePw = document.getElementById('changePw');
-    const pwStatus = document.getElementById('pwStatus');
+        const copyBtn = document.getElementById('copyUid');
+        const copyMsg = document.getElementById('copyMsg');
 
-    const copyBtn = document.getElementById('copyUid');
-    const copyMsg = document.getElementById('copyMsg');
-
-    // ---------- Helpers ----------
-    function signedOutHeader() {
-        if (!headerRight) return;
-        headerRight.innerHTML = '<a class="backlink" href="login.html">Login</a>';
-    }
-    function signedInHeader(user) {
-        if (!headerRight) return;
-        const email = user?.email || 'Account';
-        headerRight.innerHTML =
-            `<span class="muted">Signed in as </span><strong class="email-blue">${email}</strong>`;
-    }
-    function prettyProvider(id) {
-        switch (id) {
-            case 'password': return 'Email & password';
-            case 'google.com': return 'Google';
-            case 'apple.com': return 'Apple';
-            case 'facebook.com': return 'Facebook';
-            case 'github.com': return 'GitHub';
-            case 'microsoft.com': return 'Microsoft';
-            case 'twitter.com': return 'X (Twitter)';
-            case 'yahoo.com': return 'Yahoo';
-            case 'phone': return 'Phone number';
-            default: return id || 'Unknown';
+        // --- helpers ---
+        function showStatus() {
+            if (!pwStatus) return;
+            pwStatus.style.display = 'block';
+            pwStatus.setAttribute('role', 'status');
+            pwStatus.setAttribute('aria-live', 'polite');
         }
-    }
-    // Avoid duplicate listeners when hot-reloading
-    function setClick(el, handler) {
-        if (!el) return;
-        const id = el.id;
-        const clone = el.cloneNode(true);
-        el.replaceWith(clone);
-        clone.addEventListener('click', handler);
-        return document.getElementById(id);
-    }
-
-    // ---------- Auth gate + wiring ----------
-    onAuthStateChanged(auth, (user) => {
-        // Gate: must be signed in to view settings
-        if (!user) {
-            // If we're mid password-change, don't bounce to login
-            if (__pwFlow) return;
-            signedOutHeader();
-            setTimeout(() => (location.href = 'login.html?next=settings.html'), 400);
-            return;
+        function setPwMsg(type, msg) {
+            if (!pwStatus) return;
+            showStatus();
+            pwStatus.textContent = msg || '';
+            pwStatus.classList.remove('is-error', 'is-ok', 'is-hint');
+            pwStatus.classList.add(
+                type === 'ok' ? 'is-ok' :
+                    type === 'error' ? 'is-error' : 'is-hint'
+            );
         }
 
-        // Header + account basics
-        signedInHeader(user);
-        if (emailEl) emailEl.textContent = user.email || '—';
-        if (uidEl) uidEl.textContent = user.uid || '—';
-
-        // Provider list (human-friendly)
-        if (providerEl) {
-            const ids = (user.providerData?.length
-                ? user.providerData.map(p => p.providerId)
-                : [user.providerId]).filter(Boolean);
-            providerEl.textContent = ids.map(prettyProvider).join(', ') || 'Email & password';
+        function signedOutHeader() {
+            if (!headerRight) return;
+            headerRight.innerHTML = '<a class="backlink" href="login.html">Login</a>';
         }
-
-        // ✅ Prefill hidden username for Chrome on the password form
-        const pwUser = document.getElementById('pwUser');
-        if (pwUser) pwUser.value = user.email || '';
-
-        // ----- Logout -----
-        setClick(logoutBtn, async () => {
-            if (!logoutBtn) return;
-            logoutBtn.disabled = true;
-            try {
-                await signOut(auth);
-                location.href = 'index.html';
-            } catch (e) {
-                console.error(e);
-                logoutBtn.disabled = false;
-                alert('Could not log out. Please try again.');
+        function signedInHeader(user) {
+            if (!headerRight) return;
+            const email = user?.email || 'Account';
+            headerRight.innerHTML =
+                `<span class="muted">Signed in as </span><strong class="email-blue">${email}</strong>`;
+        }
+        function prettyProvider(id) {
+            switch (id) {
+                case 'password': return 'Email & password';
+                case 'google.com': return 'Google';
+                case 'apple.com': return 'Apple';
+                case 'facebook.com': return 'Facebook';
+                case 'github.com': return 'GitHub';
+                case 'microsoft.com': return 'Microsoft';
+                case 'twitter.com': return 'X (Twitter)';
+                case 'yahoo.com': return 'Yahoo';
+                case 'phone': return 'Phone number';
+                default: return id || 'Unknown';
             }
-        });
+        }
+        // Only use this cloning helper for non-form buttons (logout, copy)
+        function setClick(el, handler) {
+            if (!el) return;
+            const id = el.id;
+            const clone = el.cloneNode(true);
+            el.replaceWith(clone);
+            clone.addEventListener('click', handler);
+            return document.getElementById(id);
+        }
 
-        // ----- Change password -----
-        setClick(changePw, async () => {
-            if (!currentPw || !newPw || !pwStatus) return;
+        // --- live validator: hints + enable/disable button ---
+        function syncPwUI() {
+            if (!currentPw || !newPw || !newPw2 || !changePw) return;
+
             const cur = currentPw.value;
             const nxt = newPw.value;
-            pwStatus.textContent = '';
+            const nxt2 = newPw2.value;
 
-            if (!cur || !nxt || nxt.length < 6) {
-                pwStatus.textContent = 'Enter current and new password (min 6 chars).';
-                return;
+            // keep wrong-current sticky until currentPw changes
+            if (__stickyErr?.kind === 'wrong-current') {
+                if (cur === __stickyErr.atValue) {
+                    setPwMsg('error', 'Current password is incorrect.');
+                    changePw.disabled = false; // allow retry
+                    return;
+                } else {
+                    __stickyErr = null;
+                }
             }
 
+            let msg = '';
+            if (nxt && nxt.length < 6) msg = 'Password must be at least 6 characters.';
+            else if (nxt2 && nxt !== nxt2) msg = 'New passwords do not match.';
+
+            if (msg) setPwMsg('error', msg);
+            else if (cur || nxt || nxt2) setPwMsg('hint', '');
+
+            changePw.disabled = !(cur && nxt.length >= 6 && nxt === nxt2);
+        }
+
+        async function handlePwSubmit(e) {
+            e?.preventDefault?.();
+
+            const user = auth.currentUser;
+            if (!user || !currentPw || !newPw || !newPw2) return;
+
+            const cur = currentPw.value;
+            const nxt = newPw.value;
+            const nxt2 = newPw2.value;
+
+            if (!cur) { setPwMsg('error', 'Enter your current password.'); return; }
+            if (nxt.length < 6) { setPwMsg('error', 'New password must be at least 6 characters.'); return; }
+            if (nxt !== nxt2) { setPwMsg('error', 'New passwords do not match.'); return; }
+
             changePw.disabled = true;
-            pwStatus.textContent = 'Updating…';
-            __pwFlow = true; // start guard
+            setPwMsg('hint', 'Updating…');
+            __pwFlow = true;
 
             try {
                 const cred = EmailAuthProvider.credential(user.email, cur);
                 await reauthenticateWithCredential(user, cred);
                 await updatePassword(user, nxt);
-                pwStatus.textContent = 'Password updated ✅';
+
+                __stickyErr = null;
+                setPwMsg('ok', 'Password updated ✅');
                 currentPw.value = '';
                 newPw.value = '';
+                newPw2.value = '';
             } catch (e) {
                 console.error(e);
-                pwStatus.textContent =
-                    e.code === 'auth/wrong-password' ? 'Current password is incorrect.' :
-                        e.code === 'auth/weak-password' ? 'New password is too weak.' :
-                            e.code === 'auth/requires-recent-login' ? 'Please sign in again and retry.' :
-                                'Could not update password.';
+                // Firebase quirk: reauthenticateWithCredential returns auth/invalid-credential on wrong password
+                const code = e?.code || '';
+                if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
+                    __stickyErr = { kind: 'wrong-current', atValue: cur };
+                    setPwMsg('error', 'Current password is incorrect.');
+                } else if (code === 'auth/weak-password') {
+                    setPwMsg('error', 'New password is too weak.');
+                } else if (code === 'auth/requires-recent-login') {
+                    setPwMsg('error', 'Please sign in again and retry.');
+                } else {
+                    setPwMsg('error', 'Could not update password.');
+                }
             } finally {
-                __pwFlow = false; // end guard
+                __pwFlow = false;
                 changePw.disabled = false;
-                setTimeout(() => {
-                    if (pwStatus.textContent.includes('✅')) pwStatus.textContent = '';
-                }, 1800);
+                syncPwUI(); // re-evaluate (keeps sticky error visible if present)
+                // leave success visible; uncomment to auto-clear after a beat:
+                // if (pwStatus.classList.contains('is-ok')) setTimeout(() => setPwMsg('hint',''), 2000);
             }
-        });
-
-        // ----- Copy UID -----
-        setClick(copyBtn, async () => {
-            try {
-                await navigator.clipboard.writeText(uidEl?.textContent || '');
-                copyBtn.classList.add('copied');
-                if (copyMsg) copyMsg.textContent = 'Copied';
-                setTimeout(() => {
-                    copyBtn.classList.remove('copied');
-                    if (copyMsg) copyMsg.textContent = '';
-                }, 1200);
-            } catch (e) {
-                console.error(e);
-                if (copyMsg) copyMsg.textContent = "Couldn't copy";
-            }
-        });
-
-    }, (err) => {
-        console.error('[settings] onAuthStateChanged error', err);
-        // respect the guard here too
-        if (!__pwFlow) {
-            signedOutHeader();
-            location.href = 'login.html?next=settings.html';
         }
-    });
-</script>
-  
+
+        // --- main wiring ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                if (__pwFlow) return; // don't bounce during pw flow
+                signedOutHeader();
+                setTimeout(() => (location.href = 'login.html?next=settings.html'), 400);
+                return;
+            }
+
+            signedInHeader(user);
+            if (emailEl) emailEl.textContent = user.email || '—';
+            if (uidEl) uidEl.textContent = user.uid || '—';
+
+            if (providerEl) {
+                const ids = (user.providerData?.length
+                    ? user.providerData.map(p => p.providerId)
+                    : [user.providerId]).filter(Boolean);
+                providerEl.textContent = ids.map(prettyProvider).join(', ') || 'Email & password';
+            }
+
+            const pwUser = document.getElementById('pwUser');
+            if (pwUser) pwUser.value = user.email || '';
+
+            // live validation
+            if (!pwForm?.dataset.boundInputs) {
+                [currentPw, newPw, newPw2].forEach(el => el?.addEventListener('input', syncPwUI));
+                pwForm.dataset.boundInputs = '1';
+            }
+            syncPwUI();
+
+            // logout (safe to clone)
+            setClick(logoutBtn, async () => {
+                if (!logoutBtn) return;
+                logoutBtn.disabled = true;
+                try {
+                    await signOut(auth);
+                    location.href = 'index.html';
+                } catch (e) {
+                    console.error(e);
+                    logoutBtn.disabled = false;
+                    alert('Could not log out. Please try again.');
+                }
+            });
+
+            // change password: bind WITHOUT cloning the button
+            if (!pwForm?.dataset.boundSubmit) {
+                pwForm.addEventListener('submit', handlePwSubmit);
+                changePw?.addEventListener('click', handlePwSubmit);
+                pwForm.dataset.boundSubmit = '1';
+            }
+
+            // copy uid (safe to clone)
+            setClick(copyBtn, async () => {
+                try {
+                    await navigator.clipboard.writeText(uidEl?.textContent || '');
+                    copyBtn.classList.add('copied');
+                    if (copyMsg) copyMsg.textContent = 'Copied';
+                    setTimeout(() => {
+                        copyBtn.classList.remove('copied');
+                        if (copyMsg) copyMsg.textContent = '';
+                    }, 1200);
+                } catch (e) {
+                    console.error(e);
+                    if (copyMsg) copyMsg.textContent = "Couldn't copy";
+                }
+            });
+
+        }, (err) => {
+            console.error('[settings] onAuthStateChanged error', err);
+            if (!__pwFlow) {
+                signedOutHeader();
+                location.href = 'login.html?next=settings.html';
+            }
+        });
+    </script>
+           
   </body>
 
 </html>
