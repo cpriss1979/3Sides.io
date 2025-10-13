@@ -786,309 +786,319 @@ ul.right-align li { color: white; }
       </footer>
 
       <!-- Affirmation popup (no sound) -->
-      <script>
-        // Make sure the popup CSS exists (skip if you've already added it in <head>)
-        if (!document.getElementById("affirmation-style")) {
-          const s = document.createElement("style");
-          s.id = "affirmation-style";
-          s.textContent = `
-            .affirmation-popup{
-              position: fixed;
-              left: 50%;
-              bottom: 18px;
-              transform: translateX(-50%) translateY(16px);
-              min-width: 240px; max-width: 92vw;
-              padding: 12px 16px;
-              border-radius: 12px;
-              background: rgba(0,0,0,.85);
-              color: #fff;
-              font-weight: 600; font-size: 14px; line-height: 1.35;
-              box-shadow: 0 6px 20px rgba(0,0,0,.25);
-              opacity: 1; transition: opacity .25s ease, transform .25s ease;
-              z-index: 9999; text-align: center;
-            }`;
-          document.head.appendChild(s);
-        }
+      <script type="module">
+        import { auth, db } from "./firebase-init.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+          doc, getDoc, setDoc, deleteDoc,
+          serverTimestamp, Timestamp,
+          getDocFromCache
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { Badges } from "./badges.js"; // shared badge API
 
-      </script>
-      
-      <!-- Load your existing popup logic -->
-      <script type="module" src="script.js"></script>
-      
-      <!-- Trigger one popup on page open (iOS-safe) -->
-      <script>
-        (function () {
-          const kickoff = () => {
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-              try { window.showAffirmation && window.showAffirmation(); } catch { }
-            }));
-          };
-          if (document.readyState === "complete" || document.readyState === "interactive") {
-            setTimeout(kickoff, 450);
-          } else {
-            document.addEventListener("DOMContentLoaded", () => setTimeout(kickoff, 450), { once: true });
+        /* ========== Tiny toast (shared look) ========== */
+        function ensureToastUI() {
+          if (!document.getElementById("toast-style")) {
+            const s = document.createElement("style"); s.id = "toast-style";
+            s.textContent = `
+                    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(16px);
+                      min-width:240px;max-width:92vw;padding:12px 16px;border-radius:12px;background:rgba(0,0,0,.85);
+                      color:#fff;font-weight:600;font-size:14px;line-height:1.35;box-shadow:0 6px 20px rgba(0,0,0,.25);
+                      opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:9999}
+                    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+                    .toast .small{display:block;font-weight:500;opacity:.85;margin-top:4px}`;
+            document.head.appendChild(s);
           }
-        })();
-      </script>
-
-<!-- ================== page script ================= -->
-<script type="module">
-  import { auth, db } from "./firebase-init.js";
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import {
-    doc, getDoc, setDoc, deleteDoc,
-    serverTimestamp, Timestamp,
-    getDocFromCache
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  import { Badges } from "./badges.js"; // ⬅️ NEW: shared badge API
-
-  /* ========== Tiny toast (shared look) ========== */
-  function ensureToastUI() {
-    if (!document.getElementById("toast-style")) {
-      const s = document.createElement("style"); s.id = "toast-style";
-      s.textContent = `
-            .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(16px);
-              min-width:240px;max-width:92vw;padding:12px 16px;border-radius:12px;background:rgba(0,0,0,.85);
-              color:#fff;font-weight:600;font-size:14px;line-height:1.35;box-shadow:0 6px 20px rgba(0,0,0,.25);
-              opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;z-index:9999}
-            .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
-            .toast .small{display:block;font-weight:500;opacity:.85;margin-top:4px}`;
-      document.head.appendChild(s);
-    }
-    if (!document.getElementById("appToast")) {
-      const d = document.createElement("div");
-      d.id = "appToast"; d.className = "toast"; d.role = "status"; d.setAttribute("aria-live", "polite");
-      document.body.appendChild(d);
-    }
-  }
-  function showToast(msg, sub = "") {
-    ensureToastUI();
-    const el = document.getElementById("appToast");
-    el.innerHTML = sub ? `${msg}<span class="small">${sub}</span>` : msg;
-    el.classList.add("show");
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(() => el.classList.remove("show"), 2400);
-  }
-
-  /* ========== DOM ========== */
-  const $ = id => document.getElementById(id);
-  const statusEl = $("state");
-  const updatedEl = $("updated");
-  const letterEl = $("letterInput");
-  const outEl = $("letterDisplay");
-  const outWrap = $("letterDisplayContainer");
-  const saveBtn = $("saveBtn");
-  const delBtn = $("deleteBtn");
-
-  /* ========== State ========== */
-  let ref = null;
-  let uid = null;
-  const PENDING_KEY = "letter:pending"; // {text, uid, ts}
-
-  /* ========== Theme helpers ========== */
-  function swapTheme(cls) {
-    const root = document.documentElement;
-    [...root.classList].forEach(c => { if (c.startsWith("theme-")) root.classList.remove(c); });
-    root.classList.add(cls || "theme-original");
-  }
-
-  function renderLetterPreview(text) {
-    const t = (text || "").trim();
-    outEl.textContent = t;
-    outWrap.style.display = t ? "block" : "none";
-  }
-
-  /* ========== Badge helper (idempotent) ========== */
-  async function maybeAwardFirstLetter() {
-    try {
-      const all = await Badges.getAll();
-      if (!all.earned?.includes("letter1")) {
-        await Badges.award("letter1");
-      }
-    } catch (e) {
-      console.warn("[letter] award letter1 failed (will try again later):", e);
-    }
-  }
-
-  /* ========== Strong online test (cross-origin probe) ========== */
-  async function isReallyOnline(timeoutMs = 2500) {
-    if (!navigator.onLine) return false;
-    const url = `https://clients3.google.com/generate_204?ts=${Date.now()}`;
-    try {
-      const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), timeoutMs);
-      await fetch(url, { mode: "no-cors", cache: "no-store", signal: ctrl.signal });
-      clearTimeout(t);
-      return true; // fetch layer worked → online
-    } catch {
-      return false;
-    }
-  }
-
-  /* ========== Load existing letter (cache-first) ========== */
-  async function load() {
-    statusEl.textContent = "Loading…";
-    try {
-      let s = await getDocFromCache(ref).catch(() => null);
-      if (!s || !s.exists()) s = await getDoc(ref);
-
-      if (s.exists()) {
-        const d = s.data() || {};
-        letterEl.value = "";                 // keep input empty
-        renderLetterPreview(d.text || "");   // show only last saved server copy
-        updatedEl.textContent =
-          d.updatedAt instanceof Timestamp ? "Updated: " + d.updatedAt.toDate().toLocaleString() : "";
-      } else {
-        letterEl.value = "";
-        renderLetterPreview("");
-        updatedEl.textContent = "";
-      }
-
-      // If there’s a pending local draft, *do not* render it into the display.
-      // Just inform the user that it will sync when online.
-      try {
-        const pending = JSON.parse(localStorage.getItem(PENDING_KEY) || "null");
-        if (pending && pending.uid === uid && pending.text) {
-          statusEl.textContent = "Pending — will save when online";
-        } else {
-          statusEl.textContent = "";
+          if (!document.getElementById("appToast")) {
+            const d = document.createElement("div");
+            d.id = "appToast"; d.className = "toast"; d.role = "status"; d.setAttribute("aria-live", "polite");
+            document.body.appendChild(d);
+          }
         }
-      } catch { statusEl.textContent = ""; }
+        function showToast(msg, sub = "") {
+          ensureToastUI();
+          const el = document.getElementById("appToast");
+          el.innerHTML = sub ? `${msg}<span class="small">${sub}</span>` : msg;
+          el.classList.add("show");
+          clearTimeout(showToast._t);
+          showToast._t = setTimeout(() => el.classList.remove("show"), 2400);
+        }
 
-    } catch {
-      statusEl.textContent = "";
-    }
-  }
+        /* ========== DOM ========== */
+        const $ = id => document.getElementById(id);
+        const statusEl = $("state");
+        const updatedEl = $("updated");
+        const letterEl = $("letterInput");
+        const outEl = $("letterDisplay");
+        const outWrap = $("letterDisplayContainer");
+        const saveBtn = $("saveBtn");
+        const delBtn = $("deleteBtn");
 
-  /* ========== Save / Delete ========== */
-  async function saveLetter() {
-    const text = (letterEl.value || "").trim();
-    if (!text) { letterEl.focus(); return; }
+        /* ========== State ========== */
+        let ref = null;
+        let uid = null;
+        const PENDING_KEY = "letter:pending"; // {text, uid, ts}
 
-    statusEl.textContent = "Saving…";
+        /* ========== NEW: per-user draft helpers ========== */
+        const DRAFT_PREFIX = "letter:draft:"; // letter:draft:<uid>
+        const getDraftKey = () => (uid ? `${DRAFT_PREFIX}${uid}` : null);
 
-    if (await isReallyOnline()) {
-      try {
-        await setDoc(ref, { text, updatedAt: serverTimestamp() }, { merge: true });
-        // Now that it’s truly saved to cloud, show it in the display
-        renderLetterPreview(text);
-        letterEl.value = "";
-        statusEl.textContent = "Saved ✓";
-        showToast("Saved");
-        // refresh timestamp from server (best effort)
-        try {
-          const snap = await getDoc(ref);
-          const ts = snap.get("updatedAt");
-          updatedEl.textContent = ts ? "Updated: " + ts.toDate().toLocaleString() : "";
-        } catch { }
-        try { localStorage.removeItem(PENDING_KEY); } catch { }
+        function saveDraft(text) {
+          try {
+            const k = getDraftKey(); if (!k) return;
+            localStorage.setItem(k, JSON.stringify({ text: text || "", ts: Date.now() }));
+          } catch { }
+        }
+        function loadDraft() {
+          try {
+            const k = getDraftKey(); if (!k) return null;
+            const raw = localStorage.getItem(k);
+            if (!raw) return null;
+            const obj = JSON.parse(raw);
+            return (obj && typeof obj.text === "string") ? obj.text : null;
+          } catch { return null; }
+        }
+        function clearDraft() {
+          try {
+            const k = getDraftKey(); if (!k) return;
+            localStorage.removeItem(k);
+          } catch { }
+        }
+        function debounce(fn, ms = 300) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
-        // ⬅️ NEW: award badge after successful save
-        await maybeAwardFirstLetter();
+        /* ========== Theme helpers ========== */
+        function swapTheme(cls) {
+          const root = document.documentElement;
+          [...root.classList].forEach(c => { if (c.startsWith("theme-")) root.classList.remove(c); });
+          root.classList.add(cls || "theme-original");
+        }
 
-      } catch (e) {
-        statusEl.textContent = "Save error";
-        showToast("Couldn’t save", "Please try again.");
-      }
-    } else {
-      // Offline path: keep a pending draft locally, DO NOT render into display
-      try {
-        localStorage.setItem(PENDING_KEY, JSON.stringify({ text, uid, ts: Date.now() }));
-      } catch { }
-      statusEl.textContent = "Pending — will save when online";
-      showToast("Will save when online", "We’ll sync this once you reconnect.");
-      // Do not change the display; only clear the input for a clean feel
-      letterEl.value = "";
+        function renderLetterPreview(text) {
+          const t = (text || "").trim();
+          outEl.textContent = t;
+          outWrap.style.display = t ? "block" : "none";
+        }
 
-      // ⬅️ NEW: award locally so pet.html/badge wall light up right away
-      await maybeAwardFirstLetter();
-    }
-  }
+        /* ========== Badge helper (idempotent) ========== */
+        async function maybeAwardFirstLetter() {
+          try {
+            const all = await Badges.getAll();
+            if (!all.earned?.includes("letter1")) {
+              await Badges.award("letter1");
+            }
+          } catch (e) {
+            console.warn("[letter] award letter1 failed (will try again later):", e);
+          }
+        }
 
-  async function deleteLetter() {
-    if (!confirm("Delete your letter?")) return;
-    statusEl.textContent = "Deleting…";
-    if (!(await isReallyOnline())) {
-      showToast("You’re offline", "Reconnect to delete from the cloud.");
-      statusEl.textContent = "Offline — not deleted";
-      return;
-    }
-    try {
-      await deleteDoc(ref);
-      letterEl.value = "";
-      renderLetterPreview("");
-      updatedEl.textContent = "";
-      statusEl.textContent = "Deleted ✓";
-      try { localStorage.removeItem(PENDING_KEY); } catch { }
-    } catch (e) {
-      alert("Delete failed: " + (e.message || e));
-      statusEl.textContent = "Delete error";
-    }
-  }
+        /* ========== Strong online test (cross-origin probe) ========== */
+        async function isReallyOnline(timeoutMs = 2500) {
+          if (!navigator.onLine) return false;
+          const url = `https://clients3.google.com/generate_204?ts=${Date.now()}`;
+          try {
+            const ctrl = new AbortController();
+            const t = setTimeout(() => ctrl.abort(), timeoutMs);
+            await fetch(url, { mode: "no-cors", cache: "no-store", signal: ctrl.signal });
+            clearTimeout(t);
+            return true; // fetch layer worked → online
+          } catch {
+            return false;
+          }
+        }
 
-  /* ========== Pending upload on reconnect (only then render) ========== */
-  let _uploadingPending = false;
-  async function tryUploadPending() {
-    if (_uploadingPending) return;
-    let pending = null;
-    try { pending = JSON.parse(localStorage.getItem(PENDING_KEY) || "null"); } catch { }
-    if (!pending || pending.uid !== uid || !pending.text) return;
-    if (!(await isReallyOnline())) return;
+        /* ========== Load existing letter (cache-first) ========== */
+        async function load() {
+          statusEl.textContent = "Loading…";
+          try {
+            let s = await getDocFromCache(ref).catch(() => null);
+            if (!s || !s.exists()) s = await getDoc(ref);
 
-    _uploadingPending = true;
-    try {
-      await setDoc(ref, { text: pending.text, updatedAt: serverTimestamp() }, { merge: true });
-      localStorage.removeItem(PENDING_KEY);
-      showToast("All set", "Your pending letter has synced.");
-      statusEl.textContent = "Saved ✓";
-      // Now render the freshly saved server version
-      renderLetterPreview(pending.text);
-      try {
-        const snap = await getDoc(ref);
-        const ts = snap.get("updatedAt");
-        updatedEl.textContent = ts ? "Updated: " + ts.toDate().toLocaleString() : "";
-      } catch { }
+            if (s.exists()) {
+              const d = s.data() || {};
+              // Keep input controlled by draft (we restore it separately)
+              renderLetterPreview(d.text || "");   // show only last saved server copy
+              updatedEl.textContent =
+                d.updatedAt instanceof Timestamp ? "Updated: " + d.updatedAt.toDate().toLocaleString() : "";
+            } else {
+              renderLetterPreview("");
+              updatedEl.textContent = "";
+            }
 
-      // ⬅️ NEW: ensure badge exists after sync (idempotent)
-      await maybeAwardFirstLetter();
+            // If there’s a pending local offline save, inform user
+            try {
+              const pending = JSON.parse(localStorage.getItem(PENDING_KEY) || "null");
+              if (pending && pending.uid === uid && pending.text) {
+                statusEl.textContent = "Pending — will save when online";
+              } else if (!statusEl.textContent) {
+                statusEl.textContent = "";
+              }
+            } catch { if (!statusEl.textContent) statusEl.textContent = ""; }
 
-    } catch {
-      // keep pending; will retry next online
-    } finally {
-      _uploadingPending = false;
-    }
-  }
+          } catch {
+            statusEl.textContent = "";
+          }
+        }
 
-  /* ========== Auth + boot ========== */
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) { location.href = "login.html?next=letter.html"; return; }
-    uid = user.uid;
-    ref = doc(db, "users", uid, "private", "letter");
+        /* ========== Save / Delete ========== */
+        async function saveLetter() {
+          const text = (letterEl.value || "").trim();
+          if (!text) { letterEl.focus(); return; }
 
-    await load();
+          statusEl.textContent = "Saving…";
 
-    // cache-first theme
-    try {
-      const uref = doc(db, "users", uid);
-      const cached = await getDocFromCache(uref).catch(() => null);
-      const snap = cached?.exists() ? cached : await getDoc(uref);
-      swapTheme(snap?.exists() ? (snap.data().themeClass || "theme-original") : "theme-original");
-    } catch { }
+          if (await isReallyOnline()) {
+            try {
+              await setDoc(ref, { text, updatedAt: serverTimestamp() }, { merge: true });
+              // Now that it’s truly saved to cloud, show it in the display
+              renderLetterPreview(text);
+              letterEl.value = "";
+              statusEl.textContent = "Saved ✓";
+              showToast("Saved");
+              // refresh timestamp from server (best effort)
+              try {
+                const snap = await getDoc(ref);
+                const ts = snap.get("updatedAt");
+                updatedEl.textContent = ts ? "Updated: " + ts.toDate().toLocaleString() : "";
+              } catch { }
+              try { localStorage.removeItem(PENDING_KEY); } catch { }
 
-    // Upload pending only if we truly are online at boot
-    try { if (await isReallyOnline()) await tryUploadPending(); } catch { }
-  });
+              // NEW: clear draft on successful save
+              clearDraft();
 
-  /* ========== Events ========== */
-  saveBtn?.addEventListener("click", saveLetter);
-  delBtn?.addEventListener("click", deleteLetter);
+              // award badge after successful save
+              await maybeAwardFirstLetter();
 
-  // On reconnect, upload pending once (then it will appear)
-  window.addEventListener("online", async () => {
-    showToast("Back online", "Syncing any pending items…");
-    await tryUploadPending();
-  });
-</script>
+            } catch (e) {
+              statusEl.textContent = "Save error";
+              showToast("Couldn’t save", "Please try again.");
+            }
+          } else {
+            // Offline path: keep a pending draft locally, DO NOT render into display
+            try {
+              localStorage.setItem(PENDING_KEY, JSON.stringify({ text, uid, ts: Date.now() }));
+            } catch { }
+            statusEl.textContent = "Pending — will save when online";
+            showToast("Will save when online", "We’ll sync this once you reconnect.");
+            // Clear the input for a clean feel and keep draft in sync
+            letterEl.value = "";
+            saveDraft(""); // maintain "empty" state in draft now that box is cleared
+
+            // award locally so pet.html/badge wall light up right away
+            await maybeAwardFirstLetter();
+          }
+        }
+
+        async function deleteLetter() {
+          if (!confirm("Delete your letter?")) return;
+          statusEl.textContent = "Deleting…";
+          if (!(await isReallyOnline())) {
+            showToast("You’re offline", "Reconnect to delete from the cloud.");
+            statusEl.textContent = "Offline — not deleted";
+            return;
+          }
+          try {
+            await deleteDoc(ref);
+            letterEl.value = "";
+            renderLetterPreview("");
+            updatedEl.textContent = "";
+            statusEl.textContent = "Deleted ✓";
+            try { localStorage.removeItem(PENDING_KEY); } catch { }
+            // NEW: clear any draft as well
+            clearDraft();
+          } catch (e) {
+            alert("Delete failed: " + (e.message || e));
+            statusEl.textContent = "Delete error";
+          }
+        }
+
+        /* ========== Pending upload on reconnect (only then render) ========== */
+        let _uploadingPending = false;
+        async function tryUploadPending() {
+          if (_uploadingPending) return;
+          let pending = null;
+          try { pending = JSON.parse(localStorage.getItem(PENDING_KEY) || "null"); } catch { }
+          if (!pending || pending.uid !== uid || !pending.text) return;
+          if (!(await isReallyOnline())) return;
+
+          _uploadingPending = true;
+          try {
+            await setDoc(ref, { text: pending.text, updatedAt: serverTimestamp() }, { merge: true });
+            localStorage.removeItem(PENDING_KEY);
+            showToast("All set", "Your pending letter has synced.");
+            statusEl.textContent = "Saved ✓";
+            // Now render the freshly saved server version
+            renderLetterPreview(pending.text);
+            try {
+              const snap = await getDoc(ref);
+              const ts = snap.get("updatedAt");
+              updatedEl.textContent = ts ? "Updated: " + ts.toDate().toLocaleString() : "";
+            } catch { }
+
+            // ensure badge exists after sync (idempotent)
+            await maybeAwardFirstLetter();
+
+            // NEW: once server has it, clear any local draft (if any)
+            clearDraft();
+
+          } catch {
+            // keep pending; will retry next online
+          } finally {
+            _uploadingPending = false;
+          }
+        }
+
+        /* ========== Auth + boot ========== */
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) { location.href = "login.html?next=letter.html"; return; }
+          uid = user.uid;
+          ref = doc(db, "users", uid, "private", "letter");
+
+          // NEW: restore per-user draft into the input BEFORE loading server copy
+          const draft = loadDraft();
+          if (draft && typeof draft === "string") {
+            letterEl.value = draft;
+            statusEl.textContent = "Draft restored (not yet saved)";
+          } else {
+            letterEl.value = "";
+          }
+
+          await load();
+
+          // cache-first theme
+          try {
+            const uref = doc(db, "users", uid);
+            const cached = await getDocFromCache(uref).catch(() => null);
+            const snap = cached?.exists() ? cached : await getDoc(uref);
+            swapTheme(snap?.exists() ? (snap.data().themeClass || "theme-original") : "theme-original");
+          } catch { }
+
+          // Upload pending only if we truly are online at boot
+          try { if (await isReallyOnline()) await tryUploadPending(); } catch { }
+
+          // NEW: start autosaving the draft for this user
+          const persistDraft = debounce(() => {
+            const v = letterEl?.value ?? "";
+            saveDraft(v);
+            statusEl.textContent = v.trim() ? "Draft saved (not submitted)" : "";
+          }, 400);
+          letterEl?.addEventListener("input", persistDraft);
+
+          // Safety net on page close/reload
+          window.addEventListener("beforeunload", () => {
+            if (letterEl) saveDraft(letterEl.value || "");
+          }, { once: true });
+        });
+
+        /* ========== Events ========== */
+        saveBtn?.addEventListener("click", saveLetter);
+        delBtn?.addEventListener("click", deleteLetter);
+
+        // On reconnect, upload pending once (then it will appear)
+        window.addEventListener("online", async () => {
+          showToast("Back online", "Syncing any pending items…");
+          await tryUploadPending();
+        });
+      </script>      
                                     
 </body>
 
