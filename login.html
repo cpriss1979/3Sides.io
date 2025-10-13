@@ -252,6 +252,9 @@
       <button id="loginBtn" type="submit">Log in</button>
     </form>
     
+<p style="text-align:center; margin-top: 1rem;">
+  <a href="#" id="forgotPassword" style="color:#007bff; text-decoration:underline;">Forgot Password?</a>
+</p>
 
     <div id="msg"></div>
 
@@ -270,131 +273,189 @@
     <a href="index.html" class="backToApp">← Back to App</a>
     </div>
    
-    <!-- ...================ your page markup script ==============  ... -->
-    <script type="module">
-      import { auth, db } from "./firebase-init.js";
-      import {
-        onAuthStateChanged,
-        signInWithEmailAndPassword,
-        GoogleAuthProvider,
-        signInWithPopup,
-        getRedirectResult
-      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import {
-        doc, getDoc, setDoc, updateDoc,
-        serverTimestamp, arrayUnion
-      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-      const log = (...a) => console.log("[login]", ...a);
-
-      function goNext() {
-        const qsNext = new URLSearchParams(location.search).get("next");
-        const next = qsNext || "index.html";
-        log("redirect →", next);
-        location.replace(next);
-      }
-
-      // Keep ?next on Register link
-      (function wireLinks() {
-        const next = new URLSearchParams(location.search).get("next");
-        const regLink = document.querySelector(".auth-links a");
-        if (regLink) regLink.href = `register.html${next ? `?next=${encodeURIComponent(next)}` : ""}`;
-      })();
-
-      const emailEl = document.getElementById("email");
-      const passEl = document.getElementById("pass");
-      const btn = document.getElementById("loginBtn");
-      const msg = document.getElementById("msg");
-      const setMsg = (t) => { if (msg) msg.textContent = t || ""; };
-
-      [emailEl, passEl].forEach(el => el?.addEventListener("keydown", e => {
-        if (e.key === "Enter") btn?.click();
-      }));
-
-      async function awardLoginBadge(uid) {
-        const userRef = doc(db, "users", uid);
-        // Ensure the doc exists before updateDoc()
-        await setDoc(userRef, { createdAt: serverTimestamp() }, { merge: true });
-
-        // Root array (idempotent)
-        await updateDoc(userRef, { badges: arrayUnion("login") }).catch(async (err) => {
-          log("arrayUnion fell back (will merge set)", err?.code || err?.message);
-          await setDoc(userRef, { badges: ["login"] }, { merge: true });
-        });
-
-        // Subcollection (idempotent)
-        const badgeRef = doc(db, "users", uid, "badges", "login");
-        const snap = await getDoc(badgeRef);
-        if (!snap.exists()) {
-          await setDoc(badgeRef, {
-            key: "login",
-            label: "First Login",
-            emoji: "🔑",
-            earnedAt: serverTimestamp()
-          });
-          log("created sub-badge doc");
-        } else {
-          log("sub-badge doc already existed");
-        }
-      }
-
-      let awarding = false;
-      async function ensureBadgeThenGo(user) {
-        if (!user) return;
-        if (awarding) return;        // avoid double runs
-        awarding = true;
-        try {
-          log("awarding login badge for uid:", user.uid);
-          await awardLoginBadge(user.uid);
-          log("badge awarded");
-        } catch (e) {
-          console.error("[login] award error:", e);
-        } finally {
-          goNext();
-        }
-      }
-
-      // Email/password
-      btn?.addEventListener("click", async () => {
-        setMsg("Signing in…");
-        try {
-          const email = (emailEl?.value || "").trim();
-          const pass = passEl?.value || "";
-          await signInWithEmailAndPassword(auth, email, pass);
-          await ensureBadgeThenGo(auth.currentUser);
-        } catch (err) {
-          console.error(err);
-          setMsg(err.code || err.message);
-        }
-      });
-
-      // Optional Google Button
-      const googleBtn = document.getElementById("googleSignIn");
-      googleBtn?.addEventListener("click", async () => {
-        setMsg("Signing in with Google…");
-        try {
-          await signInWithPopup(auth, new GoogleAuthProvider());
-          await ensureBadgeThenGo(auth.currentUser);
-        } catch (err) {
-          console.error(err);
-          setMsg(err.code || err.message);
-        }
-      });
-
-      // If you ever use redirect flow
-      getRedirectResult(auth)
-        .then(async (res) => { if (res?.user) await ensureBadgeThenGo(res.user); })
-        .catch((err) => console.error(err));
-
-      // Already signed in on this page?
-      onAuthStateChanged(auth, async (u) => {
-        if (u) {
-          log("already signed in; ensuring badge");
-          await ensureBadgeThenGo(u);
-        }
+    <!-- Keep the form submit hooking into your existing #loginBtn click handler -->
+    <script>
+      // Make the form submit trigger your existing #loginBtn click handler.
+      document.getElementById('loginForm')?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        document.getElementById('loginBtn')?.click();
       });
     </script>
-       
-</body>
+  
+    <!-- ================= your page logic (Firebase) ================= -->
+   <script type="module">
+    import { auth, db } from "./firebase-init.js";
+    import {
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      GoogleAuthProvider,
+      signInWithPopup,
+      getRedirectResult,
+      sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc, getDoc, setDoc, updateDoc,
+      serverTimestamp, arrayUnion
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-</html>
+    const log = (...a) => console.log("[login]", ...a);
+
+    function goNext() {
+      const qsNext = new URLSearchParams(location.search).get("next");
+      const next = qsNext || "index.html";
+      log("redirect →", next);
+      location.replace(next);
+    }
+
+    // Keep ?next on Register link
+    (function wireLinks() {
+      const next = new URLSearchParams(location.search).get("next");
+      const regLink = document.querySelector(".auth-links a");
+      if (regLink) regLink.href = `register.html${next ? `?next=${encodeURIComponent(next)}` : ""}`;
+    })();
+
+    const emailEl = document.getElementById("email");
+    const passEl = document.getElementById("pass");
+    const btn = document.getElementById("loginBtn");
+    const msg = document.getElementById("msg");
+    const setMsg = (t, kind) => {
+      if (!msg) return;
+      msg.textContent = t || "";
+      msg.classList?.remove("msg-error", "msg-ok");
+      if (kind) msg.classList?.add(kind);
+    };
+
+    [emailEl, passEl].forEach(el => el?.addEventListener("keydown", e => {
+      if (e.key === "Enter") btn?.click();
+    }));
+
+    async function awardLoginBadge(uid) {
+      const userRef = doc(db, "users", uid);
+      // Ensure the doc exists before updateDoc()
+      await setDoc(userRef, { createdAt: serverTimestamp() }, { merge: true });
+
+      // Root array (idempotent)
+      await updateDoc(userRef, { badges: arrayUnion("login") }).catch(async (err) => {
+        log("arrayUnion fell back (will merge set)", err?.code || err?.message);
+        await setDoc(userRef, { badges: ["login"] }, { merge: true });
+      });
+
+      // Subcollection (idempotent)
+      const badgeRef = doc(db, "users", uid, "badges", "login");
+      const snap = await getDoc(badgeRef);
+      if (!snap.exists()) {
+        await setDoc(badgeRef, {
+          key: "login",
+          label: "First Login",
+          emoji: "🔑",
+          earnedAt: serverTimestamp()
+        });
+        log("created sub-badge doc");
+      } else {
+        log("sub-badge doc already existed");
+      }
+    }
+
+    let awarding = false;
+    async function ensureBadgeThenGo(user) {
+      if (!user) return;
+      if (awarding) return;        // avoid double runs
+      awarding = true;
+      try {
+        log("awarding login badge for uid:", user.uid);
+        await awardLoginBadge(user.uid);
+        log("badge awarded");
+      } catch (e) {
+        console.error("[login] award error:", e);
+      } finally {
+        goNext();
+      }
+    }
+
+    // Email/password sign-in
+    btn?.addEventListener("click", async () => {
+      try {
+        setMsg("Signing in…");
+        const email = (emailEl?.value || "").trim();
+        const pass = passEl?.value || "";
+        await signInWithEmailAndPassword(auth, email, pass);
+        await ensureBadgeThenGo(auth.currentUser);
+      } catch (err) {
+        console.error(err);
+        // friendlier errors
+        const code = err?.code || "";
+        if (code === "auth/invalid-credential" || code === "auth/wrong-password") {
+          setMsg("Incorrect email or password.", "msg-error");
+        } else if (code === "auth/user-not-found") {
+          setMsg("No account found with that email.", "msg-error");
+        } else if (code === "auth/too-many-requests") {
+          setMsg("Too many attempts. Please try again later.", "msg-error");
+        } else {
+          setMsg(err.message || "Sign-in failed.", "msg-error");
+        }
+      }
+    });
+
+    // Optional Google Button
+    const googleBtn = document.getElementById("googleSignIn");
+    googleBtn?.addEventListener("click", async () => {
+      setMsg("Signing in with Google…");
+      try {
+        await signInWithPopup(auth, new GoogleAuthProvider());
+        await ensureBadgeThenGo(auth.currentUser);
+      } catch (err) {
+        console.error(err);
+        setMsg(err.code || err.message, "msg-error");
+      }
+    });
+
+    // If you ever use redirect flow
+    getRedirectResult(auth)
+      .then(async (res) => { if (res?.user) await ensureBadgeThenGo(res.user); })
+      .catch((err) => console.error(err));
+
+    // Already signed in on this page?
+    onAuthStateChanged(auth, async (u) => {
+      if (u) {
+        log("already signed in; ensuring badge");
+        await ensureBadgeThenGo(u);
+      }
+    });
+
+    // ============ Forgot Password (Password Reset Email) ============
+    const forgotLink = document.getElementById("forgotPassword");
+    forgotLink?.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      // Prefer the typed email if present; otherwise prompt.
+      let email = (emailEl?.value || "").trim();
+      if (!email) {
+        email = prompt("Enter your registered email address:")?.trim() || "";
+      }
+      if (!email) {
+        setMsg("Please enter your email address.", "msg-error");
+        return;
+      }
+
+      try {
+        setMsg("Sending reset link…");
+        await sendPasswordResetEmail(auth, email /*, optional actionCodeSettings */);
+        setMsg("✅ Reset link sent! Check your inbox (and spam).", "msg-ok");
+      } catch (error) {
+        console.error("Password reset error:", error);
+        if (error.code === "auth/user-not-found") {
+          setMsg("No account found with that email address.", "msg-error");
+        } else if (error.code === "auth/invalid-email") {
+          setMsg("Invalid email format. Please try again.", "msg-error");
+        } else if (error.code === "auth/too-many-requests") {
+          setMsg("Too many attempts. Try again later.", "msg-error");
+        } else {
+          setMsg("Something went wrong. Please try again.", "msg-error");
+        }
+      }
+    });
+  </script>
+
+  </body>
+  
+  </html>
