@@ -43,11 +43,31 @@
     import './firebase-init.js'; // ensures app/auth/db are initialized
   </script>
     
+    <script type="module">
+      import { auth, db } from './firebase-init.js';
+      import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const LOCAL_MARK = 'gs_session_ack_ts';
+      onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        const uref = doc(db, 'users', user.uid);
+        onSnapshot(uref, async (snap) => {
+          const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+          const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+          if (bump > seen) {
+            localStorage.setItem(LOCAL_MARK, String(bump));
+            try { await signOut(auth); } finally { location.replace('login.html'); }
+          }
+        });
+      });
+    </script>
+    
   <!-- Safari/iOS friendly viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
   <!-- Title + font (kept) -->
-  <title>3-Sides — THEME</title>
+  <title>Three Sides — THEME</title>
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
 
   <!-- Public page flag (prevents auth.js from redirecting) -->
@@ -75,7 +95,17 @@
 
   <!-- NOTE: do NOT hide <html> on public pages -->
   <!-- (If you keep html{visibility:hidden} below for FOUC control, also add the tiny unlock script at the bottom) -->
-
+  <!-- prefs bootstrap: put in <head> of every page -->
+  <script>
+    (function () {
+      const PREFS_KEY = 'gs_prefs';
+      let p = {};
+      try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+      document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+      document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+    })();
+  </script>
+    
 <!-- ================= Main html style ===============-->
   <style>
     html,
@@ -436,6 +466,68 @@ padding: 10px 20px;
     color: var(--text-color) !important;
   }
   .legal-footer a { color: inherit; text-decoration: underline; }
+
+  
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
 </style>
 </head>
 
@@ -514,7 +606,6 @@ padding: 10px 20px;
     </div>
   </div>
 
-  <a href="index.html" class="backToApp">Back</a>
   <p onclick="location.href='about.html'"
     style="padding-bottom: 0; font-size: 17px; cursor: pointer; color: var(--accent-color); text-decoration: underline; font-weight: bolder; text-align: center;">
     Each theme is inspired by someone I love.
@@ -522,34 +613,19 @@ padding: 10px 20px;
     Click here to learn more
 </p>
 
-<section id="accountPanel" class="account-panel" hidden>
-  <h3>Account</h3>
-  <div class="account-row">
-    <p class="muted" style="text-align:center; margin:0; color:#fff;">
-      Signed in as
-      <strong id="acctEmail" style="color:#0b5fff; font-size:20px; word-break:break-all;">—</strong>.
-      <br>
-      Manage profile, password, and deletion.
-      <a href="settings.html" class="btn-settings" role="button"
-        style="display:inline-block; margin-top:8px; padding:10px 14px; border-radius:12px; background:#111; color:#fff; font-weight:700; text-decoration:none;">
-        Open Settings
-      </a>
-    </p>
-  </div>
-</section>
-
-<!-- ADDED: minimal, visible Privacy link (no other layout changes) -->
-<div class="legal-footer" role="contentinfo">
-  View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.
+  <div class="legal-footer">View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.</div>
 </div>
 
-<footer class="bottom-nav">
-  <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
-  <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
-  <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
-  <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
-  <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
-  <a href="theme.html" class="nav-icon" data-auth="true">🎨<span>Themes</span></a>
+<!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
+<!-- Standard Bottom Nav (use on every page) -->
+<footer class="gs-nav">
+  <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
+  <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
+  <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
+  <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
+  <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
+  <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
+      class="ico">🎨</span><span>Settings</span></a>
 </footer>
 
 <script type="module">
@@ -669,5 +745,27 @@ padding: 10px 20px;
   });
 </script>
     
+<script>
+  /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
+  (function () {
+    // 1) Mark current tab active
+    const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
+      const href = (a.getAttribute('href') || '').toLowerCase();
+      if (href === here) a.setAttribute('aria-current', 'page');
+    });
+
+    // 2) Gate authed links (replace with your real auth check if needed)
+    const isAuthed = !!localStorage.getItem('currentUser');
+    document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
+      if (isAuthed) return;
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const dest = a.getAttribute('href') || 'index.html';
+        location.href = `login.html?next=${encodeURIComponent(dest)}`;
+      });
+    });
+  })();
+</script>
   </body>
   </html>

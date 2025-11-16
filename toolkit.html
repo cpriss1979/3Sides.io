@@ -36,14 +36,45 @@
     })();
   </script>
 
+<script type="module">
+  import { auth, db } from './firebase-init.js';
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const LOCAL_MARK = 'gs_session_ack_ts';
+  onAuthStateChanged(auth, (user) => {
+    if (!user) return;
+    const uref = doc(db, 'users', user.uid);
+    onSnapshot(uref, async (snap) => {
+      const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+      const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+      if (bump > seen) {
+        localStorage.setItem(LOCAL_MARK, String(bump));
+        try { await signOut(auth); } finally { location.replace('login.html'); }
+      }
+    });
+  });
+</script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>3-Sides — FEEL-GOOD TOOLS</title>
+  <title>Three Sides — FEEL-GOOD TOOLS</title>
 
   <!-- Require login for this page (auth.js will handle redirect) -->
   <meta name="auth" content="required">
   <meta name="mobile-web-app-capable" content="yes">
 
+  <!-- prefs bootstrap: put in <head> of every page -->
+  <script>
+    (function () {
+      const PREFS_KEY = 'gs_prefs';
+      let p = {};
+      try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+      document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+      document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+    })();
+  </script>
+    
   <!-- 1) FOUC guard -->
   <style>
     html:not([data-ready="1"]) {
@@ -203,7 +234,7 @@
       max-width: 600px;
       border-collapse: collapse;
       /* heart icon, backrgound text box color */
-      background-color: rgb(221, 151, 221) !important;
+      background-color: #ffc6e0 !important;
       box-shadow: 0 4px 10px rgba(83, 27, 27, 0.08);
     }
 
@@ -227,10 +258,10 @@
     .feel-good-content {
       display: none;
       /* border around entire feel-good example container */
-      border: 2px solid black;
-      border-radius: 2.5rem;
+      border: .5px solid black;
+      border-radius: .85rem;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-      background-color: rgb(3, 3, 82);
+      background-color: #3bb5b3;
     }
 
     /* Container Around Chart and Button */
@@ -257,7 +288,7 @@
     .dropdown-icon-btn {
       width: 70px;
       height: 70px;
-      background-color: rgb(3, 3, 82);
+      background-color: rgb(25, 190, 185);
       border: 5px solid rgb(173, 245, 247);
       color: white;
       font-size: 1.6rem;
@@ -332,8 +363,8 @@
 
     /* dreamy background on toolkit.html behind entries and text */
     .dreamy-box {
-      background: rgb(3, 3, 82);
-      border-radius: 1.5rem;
+      background: #3bb5b3;
+      border-radius: .55rem;
       padding: 0.5rem;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
       margin: 3rem 0;
@@ -412,7 +443,7 @@
     .toolkit-entry button {
       background-color: #2988a7;
       color: white;
-      border-radius: .85rem;
+      border-radius: .5rem;
       font-size: 1rem;
       padding: 1rem 2rem;
       cursor: pointer;
@@ -467,7 +498,7 @@
     }
 
     .dropdown-icon-btn:hover {
-      background-color: rgba(19, 19, 108, 0.812);
+      background-color: rgb(59, 162, 197);
     }
 
     /* Navigation */
@@ -601,11 +632,12 @@
     .button-purple {
       display: inline-block;
       padding: 10px 15px !important;
-      background-color: rgb(221, 151, 221) !important;
+      background-color: #ffc6e0 !important;
       color: black !important;
       font-size: 1rem;
       font-weight: bold;
-      border: 1px solid black !important;
+      border: .5px solid rgb(172, 28, 165) !important;
+
       border-radius: 8px;
       text-decoration: none;
       cursor: pointer;
@@ -614,23 +646,18 @@
       text-align: center;
     }
 
-    .button-purple:hover {
-      background-color: #983d9d !important;
-      transform: scale(1.03) !important;
-    }
-
     .toolkit-entry button:not(.button-purple) {
       background-color: #2988a7;
       color: white;
     }
 
     #newIdea {
-      background-color: rgb(250, 230, 250) !important;
-      color: #4a154b;
+  background-color:#ffffff !important;
+  color: #4a154b;
       /* text color */
       padding: 0.75rem;
       font-size: 1rem;
-      border-radius: 1rem;
+      border-radius: .5rem;
       border-color: black !important;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
@@ -795,6 +822,141 @@ input, textarea, select {
     opacity: .85;
     margin-top: 4px;
   }
+
+/* ==================== overrides to bring up back button and privacy link =========== */
+/* --- bottom-nav clearance + tidy footer pack --- */
+:root { --nav-h: 64px; }               /* your fixed nav height */
+.bottom-nav { height: var(--nav-h); }  /* keep nav height explicit */
+
+.page-wrapper{
+  /* only the space we actually need for the fixed nav */
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px) !important;
+}
+
+/* cluster “Back” + Privacy together above the nav */
+.page-actions{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.75rem;
+  margin: 0 0 8px;        /* tiny breathing room above the nav */
+  text-align:center;
+}
+
+.page-actions .button-black{ margin:0 auto; }
+
+/* shrink the legal footer margin (don’t push it way down) */
+.legal-footer{
+  text-align:center;
+  font-size:.9rem;
+  margin:0;               /* ← key: remove large bottom margins here */
+  color: var(--text-color) !important;
+}
+.legal-footer a{ color:inherit; text-decoration:underline; }
+
+
+/* ===== Tight footer cluster just above fixed bottom nav ===== */
+:root { --nav-h: 44px; }                 /* match your .bottom-nav height */
+.bottom-nav { height: var(--nav-h); }
+
+/* Make the main column flex so the actions can sit at the bottom naturally */
+.page-wrapper{
+  min-height: 100svh;                    /* better on iOS than 100vh */
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px) !important;
+}
+
+/* Reduce the big gap under the ideas box */
+.dreamy-box { 
+  margin: 1rem auto !important;          /* was 3rem 0 in two places */
+}
+
+/* The list under the heading doesn’t need extra trailing space */
+.toolkit-list { 
+  margin: .75rem 0 1rem 0 !important; 
+}
+
+/* Cluster “Back” + Privacy together and keep it just above the nav */
+.page-actions{
+  margin-top: auto;                       /* push this block to the bottom of the column */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  padding: .25rem 0 calc(env(safe-area-inset-bottom) + 6px);
+  text-align: center;
+}
+.page-actions .button-black{ margin: 0 auto; }
+
+/* Trim legal footer spacing and inherit theme color */
+.legal-footer{
+  margin: 0;
+  font-size: .9rem;
+  color: var(--text-color) !important;
+}
+
+.legal-footer a{ color: inherit; text-decoration: underline; }
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
 </style>
 </head>
 
@@ -956,26 +1118,31 @@ input, textarea, select {
     </div>
   </div>
   
-  <div style="text-align:center; margin-bottom: 8rem;">
-    <a href="toolkit-hub.html" class="button-black">← Back</a>
-  </div>
+</div> <!-- .container -->
 
+<!-- Privacy link lives with the content -->
+<p class="legal-footer">
+  View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.
+</p>
+</div> <!-- .container -->
+</div> <!-- .page-wrapper -->
+  
+  <!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
+  <!-- Standard Bottom Nav (use on every page) -->
+  <footer class="gs-nav">
+    <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
+    <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
+    <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
+    <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
+    <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
+    <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
+        class="ico">🎨</span><span>Settings</span></a>
+  </footer>
+  
+  <!-- toast can live anywhere; it's fixed-position -->
   <div id="appToast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- ADDED: minimal, visible Privacy link (no other layout changes) -->
-  <div class="legal-footer" role="contentinfo">
-    View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.
-  </div>
-
-  <footer class="bottom-nav">
-    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
-    <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
-    <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
-    <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
-    <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
-    <a href="theme.html" class="nav-icon" data-auth="true">🎨<span>Themes</span></a>
-  </footer>
-
+  
   <!-- ================= page script ================ -->
   <script type="module">
     // --- Imports ---
@@ -1306,6 +1473,28 @@ input, textarea, select {
     }, 1200);
   </script>
 
+<script>
+  /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
+  (function () {
+    // 1) Mark current tab active
+    const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
+      const href = (a.getAttribute('href') || '').toLowerCase();
+      if (href === here) a.setAttribute('aria-current', 'page');
+    });
+
+    // 2) Gate authed links (replace with your real auth check if needed)
+    const isAuthed = !!localStorage.getItem('currentUser');
+    document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
+      if (isAuthed) return;
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const dest = a.getAttribute('href') || 'index.html';
+        location.href = `login.html?next=${encodeURIComponent(dest)}`;
+      });
+    });
+  })();
+</script>
 </body>
 
 </html>

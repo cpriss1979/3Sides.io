@@ -2,6 +2,27 @@
 <html lang="en" data-ready="0">
 
 <head>
+
+  <script type="module">
+    import { auth, db } from './firebase-init.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const LOCAL_MARK = 'gs_session_ack_ts';
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      const uref = doc(db, 'users', user.uid);
+      onSnapshot(uref, async (snap) => {
+        const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+        const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+        if (bump > seen) {
+          localStorage.setItem(LOCAL_MARK, String(bump));
+          try { await signOut(auth); } finally { location.replace('login.html'); }
+        }
+      });
+    });
+  </script>
+  
   <!-- 0) AUTH GUARD — FIRST in <head> on PROTECTED pages -->
   <script>
     (function () {
@@ -38,7 +59,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>3-Sides — JOURNAL</title>
+  <title>Three Sides — JOURNAL</title>
 
   <!-- Require login for this page (auth.js will handle redirect) -->
   <meta name="auth" content="required">
@@ -48,6 +69,17 @@
     import './firebase-init.js'; // ensures app/auth/db are initialized
   </script>
 
+<!-- prefs bootstrap: put in <head> of every page -->
+<script>
+  (function () {
+    const PREFS_KEY = 'gs_prefs';
+    let p = {};
+    try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+    document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+    document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+  })();
+</script>
+  
   <!-- 1) FOUC guard -->
   <style>
     html:not([data-ready="1"]) {
@@ -209,9 +241,9 @@
       font-size: 1rem;
       line-height: 1.5;
       /* This gives room for the text to breathe */
-      border-radius: 1rem;
-      border: 1px solid rgba(69, 111, 179, 0.903);
-      background-color: rgb(250, 230, 250) !important;
+
+      border: .02px solid rgba(119, 145, 187, 0.903);
+      background-color: #ffffff !important;
       box-sizing: border-box;
     }
   
@@ -272,22 +304,78 @@
       cursor: pointer;
     }
   
-    .bubble-box {
-      font-family: 'Comic Neue', sans-serif;
-      background: linear-gradient(to bottom, #0e1f6c, #e15eb6, #0e168a);
-      border-radius: 2rem;
-      padding: 2rem;
-      /* increased padding */
-      margin: 2rem auto;
-      max-width: 300px;
-      /* smaller width */
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-      text-align: center;
-      color: white !important;
-      border: 2px solid purple;
-      font-size: 1rem;
-      /* you can tweak this if you want */
-    }
+  /* ======================== top container quote ===================== */
+  /* ✨ Sparkling gradient speech bubble at the top of journal */
+.bubble-box {
+  position: relative;
+  font-family: 'Comic Neue', sans-serif;
+
+  /* soft teal-to-pink gradient using your colors */
+  background: linear-gradient(
+    135deg,
+    #3bb5b3 0%,
+    #5fd7cf 30%,
+    #ffc6e0 70%,
+    #fbe0f0 100%
+  );
+
+  padding: 1.25rem 1.4rem;
+  margin: 2rem auto 1.5rem;
+  max-width: 260px;
+  border-radius: 1.4rem;
+
+  /* glowing, dreamy edges */
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 6px 18px rgba(0, 0, 0, 0.15),
+    0 0 22px rgba(255, 198, 224, 0.7);
+
+  text-align: center;
+  color: rgba(0, 0, 0, 0.694) !important; /* deep ink text */
+  border: 1.5px solid #3bb5b3;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+/* soft inner highlight */
+.bubble-box::before {
+  content: "";
+  position: absolute;
+  inset: 4px 6px;
+  border-radius: 1.2rem;
+  background: radial-gradient(
+    circle at 20% 0%,
+    rgba(255, 255, 255, 0.45),
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* tiny sparkle sheen sweeping across the bubble */
+.bubble-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.0) 0%,
+    rgba(255, 255, 255, 0.42) 35%,
+    rgba(255, 255, 255, 0.0) 70%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  animation: bubble-sheen 4.5s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes bubble-sheen {
+  0%, 100% { transform: translateX(-20%); }
+  50%      { transform: translateX(20%); }
+}
+
   
     /* dreamy background on journal.html behind entries and text */
     /* Journal Entry Container - match toolkit dreamy look */
@@ -297,9 +385,7 @@
       padding: 0.75rem;
       border-radius: 0.75rem;
       margin-top: 1rem;
-      position: relative;
-      border-left: 8px solid rgb(15, 46, 131);
-      border-top: 3px solid rgb(57, 54, 210);
+      position: relative; 
     }
   
     .entry time {
@@ -363,19 +449,6 @@
       display: flex;
       justify-content: center;
       box-sizing: border-box;
-    }
-  
-    .journal-entries-box {
-      width: 100%;
-      max-width: 600px;
-      background: white;
-      border-radius: 1.5rem;
-      padding: 2rem;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-      border-top: 3px solid rgba(40, 130, 180, 0.2);
-      border-bottom: 3px solid rgba(40, 130, 180, 0.2);
-      box-sizing: border-box;
-      text-align: center;
     }
   
     .full-journal-wrapper {
@@ -546,7 +619,7 @@
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       position: relative;
-      border-left: 6px solid rgb(15, 46, 131);
+
       font-size: 1rem;
       line-height: 1.45;
       color: #000;
@@ -597,7 +670,6 @@
       min-height: 100vh;
       box-sizing: border-box;
       width: 100%;
-      padding-bottom: 4rem;
       /* room for bottom nav */
     }
   
@@ -613,7 +685,7 @@
       /* WebKit inner text (Chrome/Safari) */
       caret-color: #111;
       /* cursor color */
-      background-color: #f6dff1;
+      background-color: #ffffff;
       /* your light pink; tweak if needed */
     }
   
@@ -637,18 +709,85 @@
   
     /* ================= register css add ons ================ */
     .legal-footer {
-      text-align: center;
-      font-size: 0.9rem;
-      margin-top: 8px;
-      color: var(--text-color) !important;
-      /* NEW: match theme text color */
-    }
-  
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  color: var(--text-color) !important;
+  /* NEW: match theme text color */
+}
+
     .legal-footer a {
       color: inherit;
       /* NEW: use same color as parent */
       text-decoration: underline;
     }
+
+    /* ========== GLOBAL BOTTOM NAV (identical on all pages) ========== */
+:root{
+  --nav-h: 64px;                 /* fixed bar height */
+  --nav-fs: 12px;                /* label font size */
+  --nav-icon-fs: 20px;           /* emoji/icon size */
+  --nav-bg: #fafafa;             /* bar background */
+  --nav-border: rgba(69,111,179,.25);
+  --nav-text: rgba(69,111,179,1);
+  --nav-text-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar */
+.page-wrapper{
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Bar container */
+.bottom-nav{
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: var(--nav-bg);
+  border-top: 1px solid var(--nav-border);
+  display: flex;
+  align-items: center;           /* vertical centering */
+  justify-content: space-around; /* even spacing */
+  padding: 0 env(safe-area-inset-left, 8px) 0 env(safe-area-inset-right, 8px);
+  z-index: 1000;
+  overflow: hidden;              /* prevent any wrap spill */
+}
+
+/* Each item = equal column */
+.bottom-nav .nav-icon{
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  text-decoration: none;
+  color: var(--nav-text);
+  line-height: 1;
+  padding: 0; margin: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+/* Fixed sizes so height never changes */
+.bottom-nav .nav-icon .ico{ font-size: var(--nav-icon-fs); display:block; }
+.bottom-nav .nav-icon span{ font-size: var(--nav-fs); display:block; }
+
+/* Active + hover */
+.bottom-nav .nav-icon[aria-current="page"]{
+  color: var(--nav-text-active);
+  font-weight: 700;
+}
+.bottom-nav .nav-icon:hover{ color:#72aadf; }
+
+/* Optional helpers for the “Back + Privacy” cluster just above the bar */
+.page-actions{
+  display:flex; flex-direction:column; align-items:center; gap:.5rem;
+  margin:.25rem 0 .5rem;
+}
+.legal-footer{ text-align:center; font-size:.9rem; margin:0; color:var(--text-color); }
+.legal-footer a{ color:inherit; text-decoration:underline; }
   </style>
   
   <style id="affirmation-style">
@@ -694,7 +833,7 @@
       max-width: 100vw;
       margin: 0 auto;
       padding: 0.5rem 0;
-      background: rgb(3, 3, 82);
+
       box-sizing: border-box;
       overflow-x: hidden;
       /* stops right cutoff */
@@ -723,7 +862,7 @@
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      border-left: 6px solid rgb(15, 46, 131);
+
       color: #000;
       line-height: 1.45;
       box-sizing: border-box;
@@ -773,9 +912,7 @@
     body {
       overflow-x: hidden;
     }
-  
-  
-  
+
     .bottom-journal-section h1 {
       margin: 8px 12px 10px;
       /* tight title spacing */
@@ -801,7 +938,7 @@
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
       position: relative;
-      border-left: 6px solid rgb(15, 46, 131);
+
       line-height: 1.45;
       color: #000;
     }
@@ -858,8 +995,7 @@
       margin: 8px 0;
       padding: 12px 40px 12px 14px;
       /* room for the ❌ on the right */
-      border-left: 6px solid rgb(15, 46, 131);
-      border-radius: 10px;
+      border-radius: 6px !important;
       box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
       line-height: 1.45;
       color: #000;
@@ -887,17 +1023,6 @@
       transform: scale(1.2);
     }
   
-    /* Section wrapper – no extra side padding */
-    .bottom-journal-section {
-      width: 100%;
-      margin: 0;
-      padding: 8px 0;
-      /* tighter top/bottom only */
-      background: rgb(3, 3, 82);
-      box-sizing: border-box;
-      overflow-x: hidden;
-    }
-  
     /* Mobile: keep equal gutters, keep space for ❌ */
     @media (max-width:600px) {
       #entryList {
@@ -915,16 +1040,14 @@
         font-size: 19px;
       }
     }
-  
-    /* === CANONICAL FIX — paste at the very end of <style> === */
-  
+    
     /* Blue band: perfectly even top/bottom, no side padding */
     .bottom-journal-section {
       width: 100%;
       margin: 0;
       padding-block: 12px;
       /* equal top & bottom */
-      background: rgb(3, 3, 82);
+      background: #3bb5b3;
       box-sizing: border-box;
       overflow-x: hidden;
       /* avoids any right cut-off */
@@ -958,7 +1081,7 @@
       padding: 12px 40px 12px 14px;
       /* right room for the ❌, nice left padding */
       background: #fff;
-      border-left: 6px solid rgb(15, 46, 131);
+
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
       line-height: 1.45;
@@ -1003,7 +1126,6 @@
         font-size: 19px;
       }
     }
-  
   
     /* Nudge the blue band spacing so the title sits a little higher */
     .bottom-journal-section {
@@ -1053,18 +1175,86 @@
         right: 10px !important;
       }
     }
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
+/* --- Journal page: keep Privacy link fully above the fixed nav --- */
+body.journal-page .legal-footer {
+  text-align: center;
+  font-size: 0.9rem;
+  margin: 8px 0 calc(var(--gs-nav-h) + 24px) !important;
+  /* top 8px, bottom = nav height + 24px buffer */
+  color: var(--text-color) !important;
+}
   </style>
 
 
 </head>
 
-<body>
+<body class="journal-page gs-has-nav">
   <br>
   <!-- Top journal section -->
   <div class="top-journal-section">
 
     <div class="bubble-box sparkle-effect" style="color: rgb(19, 25, 97);">
-      <b>Journaling with bipolar isn’t just helpful — it’s powerful - </b>
+      <b>Journaling with bipolar isn’t just helpful... it’s<br>POWERFUL </b>
     </div>
 
     <div class="entry-list" id="journalEntries"></div>
@@ -1089,24 +1279,21 @@
 
     </div>
 
-    <!-- ✂️ Moved outside the blue box -->
-    <div style="text-align: center; margin-top: 1rem; margin-bottom: 3rem;">
-      <a href="toolkit-hub.html" class="backToApp"
-        style="color: var(--text-color); font-weight: bold; font-size: 1.2rem;">← Back</a>
+   
+   <br>
+      <div class="legal-footer">View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.</div>
     </div>
-
-    <!-- ADDED: minimal, visible Privacy link (no other layout changes) -->
-    <div class="legal-footer" role="contentinfo">
-      View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.
-    </div>
-
-    <footer class="bottom-nav">
-      <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
-      <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
-      <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
-      <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
-      <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
-      <a href="theme.html" class="nav-icon" data-auth="true">🎨<span>Themes</span></a>
+    
+    <!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
+    <!-- Standard Bottom Nav (use on every page) -->
+    <footer class="gs-nav">
+      <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
+      <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
+      <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
+      <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
+      <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
+      <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
+          class="ico">🎨</span><span>Settings</span></a>
     </footer>
 
     <!-- Firebase-only auth gate, fast theme, live journal + STREAK BADGES -->
@@ -1491,6 +1678,29 @@
         await awardStreakBadgesIfNeeded();
       });
     </script>
+
+<script>
+  /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
+  (function () {
+    // 1) Mark current tab active
+    const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
+      const href = (a.getAttribute('href') || '').toLowerCase();
+      if (href === here) a.setAttribute('aria-current', 'page');
+    });
+
+    // 2) Gate authed links (replace with your real auth check if needed)
+    const isAuthed = !!localStorage.getItem('currentUser');
+    document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
+      if (isAuthed) return;
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const dest = a.getAttribute('href') || 'index.html';
+        location.href = `login.html?next=${encodeURIComponent(dest)}`;
+      });
+    });
+  })();
+</script>
 
 </body>
 

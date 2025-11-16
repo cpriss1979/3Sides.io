@@ -43,12 +43,43 @@
     import './firebase-init.js'; // ensures app/auth/db are initialized
   </script>
     
+    <script type="module">
+      import { auth, db } from './firebase-init.js';
+      import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const LOCAL_MARK = 'gs_session_ack_ts';
+      onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        const uref = doc(db, 'users', user.uid);
+        onSnapshot(uref, async (snap) => {
+          const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+          const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+          if (bump > seen) {
+            localStorage.setItem(LOCAL_MARK, String(bump));
+            try { await signOut(auth); } finally { location.replace('login.html'); }
+          }
+        });
+      });
+    </script>
+    
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>3-Sides — WELLNESS HUB</title>
+  <title>Three Sides — WELLNESS HUB</title>
 
   <!-- Require login for this page -->
   <meta name="auth" content="required">
 
+  <!-- prefs bootstrap: put in <head> of every page -->
+  <script>
+    (function () {
+      const PREFS_KEY = 'gs_prefs';
+      let p = {};
+      try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+      document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+      document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+    })();
+  </script>
+    
   <!-- 1) FOUC guard -->
   <style>
     html:not([data-ready="1"]) {
@@ -191,14 +222,15 @@
       color: var(--text-color) !important;
     }
 
+    
     .button-purple {
       display: inline-block;
       padding: 10px 20px;
-      background-color: rgb(221, 151, 221);
+      background-color: #ffc6e0;
       color: black;
       font-size: 1rem;
       font-weight: bold;
-      border: 1px solid black;
+      border: 1px solid #d394b0;
       border-radius: 8px;
       text-decoration: none;
       cursor: pointer;
@@ -208,7 +240,7 @@
     }
 
     .button-purple:hover {
-      background-color: #983d9d !important;
+      background-color: #cd8fc3 !important;
       transform: scale(1.03);
     }
 
@@ -337,6 +369,66 @@ html, body { display:block; } /* simplest fix */
     color: var(--text-color) !important;
   }
   .legal-footer a { color: inherit; text-decoration: underline; }
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
 </style>
 
 </head>
@@ -353,29 +445,33 @@ html, body { display:block; } /* simplest fix */
       Here you’ll find everything that helps you build, track, and protect your wellness plan.
     </p>
     <div class="button-row">
-      <a class="button-purple" href="wellnessPlan.html">✨ My Wellness Plan</a>
+      <a class="button-purple" href="wellnessPlan.html">☀️ My Wellness Plan</a>
       <a class="button-purple" href="letter.html">💌 Letter to Future Me</a>
       <a class="button-purple" href="support.html">🫂 Support People</a>
     </div>
   </div>
   <div class="torn-paper-divider"></div>
 
-  <br><br>
-
-<!-- ADDED: minimal, visible Privacy link (no other layout changes) -->
-<div class="legal-footer" role="contentinfo">
-  View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.
-</div>
-
-<footer class="bottom-nav">
-  <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
-  <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
-  <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
-  <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
-  <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
-  <a href="theme.html" class="nav-icon" data-auth="true">🎨<span>Themes</span></a>
-</footer>
-
+  <br>
+  <div class="legal-footer">
+    View our
+    <a href="privacy.html" rel="noopener">Privacy Policy</a>
+    and
+    <a href="terms.html" rel="noopener">Terms of Use</a>.
+  </div>
+  
+  <!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
+  <!-- Standard Bottom Nav (use on every page) -->
+  <footer class="gs-nav">
+    <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
+    <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
+    <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
+    <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
+    <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
+    <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
+        class="ico">🎨</span><span>Settings</span></a>
+  </footer>
+  
   <!-- ======================= SCRIPT ======================= -->
   <script type="module">
     import { auth, db } from "./firebase-init.js";
@@ -459,6 +555,28 @@ html, body { display:block; } /* simplest fix */
     setTimeout(() => { if (html.getAttribute("data-ready") !== "1") show(); }, 1500);
   </script>
   
+  <script>
+    /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
+    (function () {
+      // 1) Mark current tab active
+      const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+      document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
+        const href = (a.getAttribute('href') || '').toLowerCase();
+        if (href === here) a.setAttribute('aria-current', 'page');
+      });
+
+      // 2) Gate authed links (replace with your real auth check if needed)
+      const isAuthed = !!localStorage.getItem('currentUser');
+      document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
+        if (isAuthed) return;
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          const dest = a.getAttribute('href') || 'index.html';
+          location.href = `login.html?next=${encodeURIComponent(dest)}`;
+        });
+      });
+    })();
+  </script>
 </body>
 
 </html>

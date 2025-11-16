@@ -53,9 +53,40 @@
     import './firebase-init.js'; // ensures app/auth/db are initialized
   </script>
     
+    <script type="module">
+      import { auth, db } from './firebase-init.js';
+      import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const LOCAL_MARK = 'gs_session_ack_ts';
+      onAuthStateChanged(auth, (user) => {
+        if (!user) return;
+        const uref = doc(db, 'users', user.uid);
+        onSnapshot(uref, async (snap) => {
+          const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+          const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+          if (bump > seen) {
+            localStorage.setItem(LOCAL_MARK, String(bump));
+            try { await signOut(auth); } finally { location.replace('login.html'); }
+          }
+        });
+      });
+    </script>
+    
   <!-- 0) Auth gate (protected page) -->
   <meta name="auth" content="required">
   <script type="module" src="auth.js"></script>
+
+  <!-- prefs bootstrap: put in <head> of every page -->
+  <script>
+    (function () {
+      const PREFS_KEY = 'gs_prefs';
+      let p = {};
+      try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+      document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+      document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+    })();
+  </script>
 
   <!-- 1) FOUC guard: keep hidden until theme & auth are ready -->
   <style>
@@ -77,7 +108,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>3-Sides — MY PET</title>
+  <title>Three Sides — MY PET</title>
   <meta name="description" content="Care for your companion, earn milestones, and keep your streak growing." />
   <meta name="theme-color" content="#030352">
   <meta name="color-scheme" content="dark light">
@@ -160,7 +191,6 @@
 
     .three-d-title {
       font-size: 2.5rem;
-
       text-align: center;
       margin-bottom: 2rem;
       color: white;
@@ -173,7 +203,6 @@
       font-size: 1.2rem;
       border: 1px solid white;
       border-radius: 1rem;
-      
       background-color: #00080a;
       color: white;
       cursor: pointer;
@@ -345,12 +374,12 @@
     }
 
     .white-button {
-      background-color: #4dafd0;
+      background-color: #9ec1ff; /* ===== color for quetions buttons */
       color: black;
       font-size: 1rem;
       font-weight: bold;
       padding: .6rem 1.2rem;
-      border: 2px solid white;
+      border: 2px solid #82a9eb;
       border-radius: 8px;
       cursor: pointer;
       margin: .5rem;
@@ -383,7 +412,7 @@
     }
 
     h1 {
-      color: #eff546;
+      color: #eef0bae1;
     }
 
     /* ----------- BADGE WALL (pet page) ----------- */
@@ -395,7 +424,7 @@
     .pet-badges h3 {
       margin: 0 0 .75rem;
       text-align: center;
-      color: #fff
+      color: #123e24
     }
 
     .badge-grid {
@@ -424,7 +453,7 @@
   font-size:38px;
   background: radial-gradient(70% 70% at 30% 30%, hsl(var(--h,210) 80% 70%) 0%, hsl(var(--h,210) 80% 55%) 45%, hsl(var(--h,210) 80% 45%) 100%);
   box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 18px rgba(255,255,255,.25);
-  border: 3px solid rgba(255,255,255,.7);
+  border: 1.2px solid rgba(107, 122, 111, 0.7);
   transition: transform .12s ease, filter .2s ease, opacity .2s ease;
 }
 
@@ -432,19 +461,19 @@
       filter: grayscale(1);
       opacity: .5;
       background: linear-gradient(135deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
-      border-color: rgba(255, 255, 255, .35)
+      border-color: rgba(129, 105, 105, 0.35)
     }
 
     .label {
       font-size: .85rem;
-      color: #fff;
+      color: black;
       opacity: .95;
       text-align: center;
       max-width: 112px
     }
 
     .badge.locked .label {
-      color: rgba(255, 255, 255, .7)
+      color: black
     }
 
     @media (max-width:460px){
@@ -480,7 +509,7 @@
   html.pet-page body {
     min-height: 100%;
     margin: 0;
-    background-color: rgb(11, 71, 94) !important;
+    background-color: #3bb5b3 !important;
     color: #fff !important;
   }
 
@@ -494,18 +523,15 @@
   /* ============== h3 - subheadings - sections title colors =========== */ 
   /* Only affect h3 inside your pet sections */
 #journalSection h3 { 
-  color: yellow;           /*  grey sub headings */
-  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  color: rgb(44, 44, 40);           /*  grey sub headings */
 }
 
 #waterSection h3 { 
-  color: yellow;           /*  grey sub headings */
-  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  color: rgb(44, 44, 40);           /*  grey sub headings */
 }
 
 #kindnessSection h3 { 
-  color: yellow;           /*  grey sub headings */
-  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  color: rgb(44, 44, 40);           /*  grey sub headings */
 }
 
 /* ================== buttons: side-by-side ============== */
@@ -543,11 +569,6 @@
 #waterSection .button-stack,
 #kindnessSection .button-stack {
   margin-bottom: 3.25rem;   /* bump this up/down to taste */
-}
-
-/* Beat the global button margin so it doesn't add vertical gaps */
-.section .button-stack .white-button{
-  margin: 0 .4rem;          /* no vertical margin, small horizontal */
 }
 
 /* Smaller headings above the button rows */
@@ -775,7 +796,7 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
   width:min(350px,92vw);
   margin:.25rem auto .35rem;
   text-align:center;
-  color: yellowgreen;              /* << requested color */
+  color: yellowgreen;              
   font-weight:700;
 }
 
@@ -820,7 +841,6 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
     border: 1px solid rgba(255,255,255,.18);
     background: #102514;
     border: 5mm ridge rgb(211 220 50 / 0.6);
-    
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
     text-align: center;
@@ -841,7 +861,7 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
   #completeMsg.show { display: block; }
 
   #feedMsg, #waterMsg, #bathMsg { 
-    color: white; 
+    color: rgb(38, 38, 45); 
   }           
 
 /* =================== top brown portion =============== */
@@ -875,7 +895,7 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
 
   /* 3) Make the brown band start at the literal top (incl. notches) */
   .hero-brown.full-bleed {
-    --hero-bg: #11200b;    /* your brown */
+    --hero-bg: #3bb5b3;    /* top half color behind image  */
     --hero-fg: #f5efe6;
 
     /* full-bleed edge to edge */
@@ -889,8 +909,7 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
     /* push content down but keep background at the top */
     padding-top: calc(16px + env(safe-area-inset-top, 0px));
     padding-bottom: 12px;
-    border-top: 7mm ridge rgb(211 220 50 / 0.6);
-    border-bottom: 7mm ridge rgb(211 220 50 / 0.6);
+    border-bottom: 7mm ridge #9ec1ff;
     position: relative;
     z-index: 1;            /* above sparkles layer if needed */
   }
@@ -899,7 +918,7 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
   .hero-brown h1:first-child { margin-top: 0; }
 
   /* keep your intro line yellow on brown */
-  .hero-brown #petMessage { color: #e9ee7e !important; }
+  .hero-brown #petMessage { color: #042d20c8 !important; }
 
   /* if .pet-container paints blue, neutralize it inside the hero only */
   .hero-brown .pet-container { background: transparent !important; box-shadow: none; }
@@ -913,17 +932,18 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
     padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 16px);
   }
 
+/* ======================== reset button at the bottom of pet =================== */
   /* Make the reset button obvious and centered */
   #resetPetBtn.reset-btn {
     display: block;
     width: min(520px, 92%);
     margin: 16px auto 12px;
     padding: 12px 16px;
-    border: 4px solid #102514;
+    border: .2px solid #102514;
     border-radius: 14px;
     font-weight: 700;
     text-align: center;
-    background:  rgb(211 220 50 / 0.6); /* warm gold */
+    background:  rgba(191, 192, 206, 0.6); /* warm gold */
     color: black;
     box-shadow: 0 6px 18px rgba(0,0,0,.18);
     cursor: pointer;
@@ -967,7 +987,260 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
 /* Privacy link at the bottom: make it match the accent */
 .legal-footer a { color: #C9BBFF !important; }              /* link color */
 .legal-footer a:hover { text-decoration: underline; filter: brightness(1.12); }
-  </style>
+ 
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
+/* ===== Make pet buttons match Letter page buttons ===== */
+
+:root {
+  /* reuse the letter button colors */
+  --pet-btn-bg: #0f766e;       /* main teal */
+  --pet-btn-hover: #115e59;    /* darker teal on hover */
+  --pet-btn-text: #ecfdf5;     /* soft minty-white text */
+}
+
+/* Journal / Water / Kindness buttons */
+.white-button {
+  background-color: var(--pet-btn-bg) !important;
+  color: var(--pet-btn-text) !important;
+  font-family: 'Open Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin: 0.5rem;
+  box-shadow: 0 6px 18px rgba(15, 118, 110, 0.3);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Hover / focus – same feel as Letter page */
+.white-button:hover:not(:disabled),
+.white-button:focus-visible:not(:disabled) {
+  background-color: var(--pet-btn-hover) !important;
+  color: var(--pet-btn-text) !important;
+  transform: translateY(1px);
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.4);
+  outline: none;
+}
+
+/* Disabled pet buttons (before journaling, etc.) */
+.white-button:disabled {
+  background-color: #e5e7eb !important;  /* light gray */
+  color: #6b7280 !important;             /* muted gray text */
+  border: none !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Reset Pet button – same style family, just a bit wider */
+#resetPetBtn {
+  background-color: var(--pet-btn-bg) !important;
+  color: var(--pet-btn-text) !important;
+  font-family: 'Open Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.4rem;
+  box-shadow: 0 6px 18px rgba(15, 118, 110, 0.3);
+  cursor: pointer;
+  width: min(520px, 92%);
+  margin: 16px auto calc(env(safe-area-inset-bottom, 0) + 12px) !important;
+  display: block;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+#resetPetBtn:hover {
+  background-color: var(--pet-btn-hover) !important;
+  transform: translateY(1px);
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.4);
+}
+
+/* --- Replace the double blue ridge with a soft teal divider that blends --- */
+.hero-brown.full-bleed{
+  border: 0 !important;              /* kill the ridge */
+  position: relative;
+}
+.hero-brown.full-bleed::after{
+  content:"";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;   /* sits right below the hero band */
+  height: 14px;                      /* thickness of the fade */
+  /* gentle teal bloom → transparent */
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 94, 89, 0.35),          /* deep teal echo of buttons */
+    rgba(11, 94, 89, 0.10) 55%,
+    rgba(11, 94, 89, 0.00) 100%
+  );
+  /* tiny hairline to finish the edge cleanly */
+  box-shadow: 0 1px 0 rgba(0,0,0,.06), 0 0 0 1px rgba(236, 253, 245, .06) inset;
+  pointer-events: none;
+}
+
+/* --- Optional: tint the fixed bottom nav line to the same teal family --- */
+:root{
+  --gs-nav-border: rgba(11, 94, 89, .22) !important; /* was blue-ish */
+  --gs-nav-text:   rgba(11, 94, 89, 1)  !important;
+  --gs-nav-active: #0a4d48 !important;
+}
+/* uses your existing footer.gs-nav styles; this just recolors the border/text */
+
+/* (Tiny polish) make the status pill sit better on teal */
+.status-wrap.card{
+  background: rgba(11, 94, 89, .10) !important; /* subtle glass teal */
+  border: 1px solid rgba(11, 94, 89, .22) !important;
+}
+
+/* ================= register css add ons ================ */
+/* ADDED: tiny legal footer style for the Privacy link */
+/* Privacy link at the bottom: make it match the accent */
+.legal-footer a { color: #C9BBFF !important; }              /* link color */
+.legal-footer a:hover { text-decoration: underline; filter: brightness(1.12); }
+  
+ 
+  .legal-footer {
+    color: black !important;
+    text-align: center;
+  }
+
+  .legal-footer a {
+    color: rgb(49, 64, 162) !important;
+  }
+
+  .section .button-stack .white-button{
+  margin: 0 .4rem;          /* no vertical margin, small horizontal */
+  flex: 1 1 0;              /* 🔹 equal width for both buttons in the row */
+  max-width: 180px;         /* 🔹 cap so they don’t get huge on wide screens */
+}
+
+</style>
 
 </head>
 
@@ -986,7 +1259,7 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
 <br>
     <p id="petMessage"
     style="font-size:1.4rem; font-weight:700; text-align:center; line-height:1.35; margin:.25rem 0 1rem; color:#e9ee7e;">
-    Hi, I'm your wellness buddy! <br> Let's grow together 🌱
+    Hi, I'm your wellness buddy! <br> Let's grow together 🌻
     </p>
 
   </div>
@@ -995,23 +1268,18 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
 
 <br>
 
-<!-- (2)-->
-<div class="status-wrap card">
-  <p class="pet-stats">
-    <span class="pet-name">Baby • Feeds:</span>
-    <span id="feedCount">0</span>
-  </p>
+<div class="button-stack">
+  <button id="journalBtn" class="white-button" onclick="setJournalClicked(); window.location.href='journal.html';">
+    📝 Go Journal
+  </button>
+
+  <button id="feedPetBtn" class="white-button" disabled>
+    🍽️ Feed Pet
+  </button>
 </div>
-<br>
-<div class="section" id="journalSection">
-  <h3>Journal To Feed Your Pet</h3>
-  <div class="button-stack">
-    <a href="journal.html" onclick="setJournalClicked()">
-      <button id="journalBtn" class="white-button">📝 Go Journal</button>
-    </a>
-    <button id="feedPetBtn" class="white-button" disabled>🍽️ Feed Pet</button>
-  </div>
+ 
   <br>
+ 
   <!-- ✅ outside the stack, same structure as the others -->
   <p id="feedMsg" class="thankMsg">Thanks for journaling today, <br>your mind thanks you! 🐾</p>
 </div>
@@ -1057,19 +1325,20 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
 
     <button id="resetPetBtn" class="reset-btn" onclick="resetPet()">Reset Pet</button>
   
-    <!-- ADDED: minimal, visible Privacy link (no other layout changes) -->
-    <div class="legal-footer" role="contentinfo">
-      View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.
-    </div>
+    <div class="legal-footer">View our <a href="privacy.html" rel="noopener">Privacy Policy</a>.</div>
 
-    <footer class="bottom-nav">
-      <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
-      <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
-      <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
-      <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
-      <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
-      <a href="theme.html" class="nav-icon" data-auth="true">🎨<span>Themes</span></a>
-    </footer>
+    <!-- ADDED: minimal, visible Privacy link (no other layout changes) -->
+    <!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
+    <!-- Standard Bottom Nav (use on every page) -->
+    <footer class="gs-nav">
+      <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
+      <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
+      <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
+      <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
+      <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
+      <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
+          class="ico">🎨</span><span>Settings</span></a>
+      </footer>
 
   <!-- =================== PAGE SCRIPT =================== -->
   <!-- =================== PAGE SCRIPT (final) =================== -->
@@ -1233,6 +1502,52 @@ img, svg, video { max-width: 100%; height: auto; display: block!important; }
       wireGlobalOfflineGuard();
     });
   </script>
+
+<script>
+  /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
+  (function () {
+    // 1) Mark current tab active
+    const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
+      const href = (a.getAttribute('href') || '').toLowerCase();
+      if (href === here) a.setAttribute('aria-current', 'page');
+    });
+
+    // 2) Gate authed links (replace with your real auth check if needed)
+    const isAuthed = !!localStorage.getItem('currentUser');
+    document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
+      if (isAuthed) return;
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const dest = a.getAttribute('href') || 'index.html';
+        location.href = `login.html?next=${encodeURIComponent(dest)}`;
+      });
+    });
+  })();
+</script>
+
+<script>
+  /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
+  (function () {
+    // 1) Mark current tab active
+    const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
+      const href = (a.getAttribute('href') || '').toLowerCase();
+      if (href === here) a.setAttribute('aria-current', 'page');
+    });
+
+    // 2) Gate authed links (replace with your real auth check if needed)
+    const isAuthed = !!localStorage.getItem('currentUser');
+    document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
+      if (isAuthed) return;
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const dest = a.getAttribute('href') || 'index.html';
+        location.href = `login.html?next=${encodeURIComponent(dest)}`;
+      });
+    });
+  })();
+</script>
 
 </body>
 </html>

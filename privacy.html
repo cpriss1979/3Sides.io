@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Privacy Policy - 3-Sides</title>
+    <title>Privacy Policy - Three Sides</title>
     <meta name="description" content="Privacy Policy for 3-Sides by Crystal Roberts (GlowCode Studio).">
     
     <!-- At the top of delete-account.html <body> or in <head> -->
@@ -12,6 +12,37 @@
         import './firebase-init.js'; // ensures app/auth/db are initialized
     </script>
         
+        <script type="module">
+            import { auth, db } from './firebase-init.js';
+            import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+            import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+            const LOCAL_MARK = 'gs_session_ack_ts';
+            onAuthStateChanged(auth, (user) => {
+                if (!user) return;
+                const uref = doc(db, 'users', user.uid);
+                onSnapshot(uref, async (snap) => {
+                    const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+                    const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+                    if (bump > seen) {
+                        localStorage.setItem(LOCAL_MARK, String(bump));
+                        try { await signOut(auth); } finally { location.replace('login.html'); }
+                    }
+                });
+            });
+         </script>
+        
+        <!-- prefs bootstrap: put in <head> of every page -->
+        <script>
+            (function () {
+                const PREFS_KEY = 'gs_prefs';
+                let p = {};
+                try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+                document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+                document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+            })();
+        </script>
+            
     <style>
         body {
             font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -96,26 +127,259 @@
         padding: 0 1rem max(1.5rem, env(safe-area-inset-bottom));
       }
     }
+
+
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
+/* =========================== system settings color overrides =========== */
+
+/* 1. Theme colors to match teal / pink app */
+:root {
+  --bg: #c7f5f2;          /* soft teal background */
+  --panel: #ffffff;       /* white cards */
+  --ink: #134e4a;         /* deep teal text */
+  --muted: #64748b;
+  --line: #d1e4ec;
+  --ios-blue: #ff6fa9;    /* pink primary button */
+  --ios-blue-d: #f0529c;
+  --ios-gray-fill: #f4fbff;
+  --ios-gray-border: #cbd5e1;
+  --ios-ink: #134e4a;
+}
+
+/* 2. Page background + text color */
+body {
+  background: radial-gradient(circle at top, #e5fbff 0, #c7f5f2 55%, #a7e7dd 100%);
+  color: var(--ink);
+}
+
+/* 3. Header + main layout (also fixes bottom being cut off) */
+header {
+  background: transparent;
+  border-bottom: none;
+  padding-left: calc(16px + env(safe-area-inset-left, 0px));
+  padding-right: calc(16px + env(safe-area-inset-right, 0px));
+}
+
+main {
+  max-width: 430px;
+  margin: 0 auto;
+  /* extra bottom padding so Danger zone isn't under the nav */
+  padding: 8px 16px calc(var(--nav-h) + 24px + env(safe-area-inset-bottom, 0px));
+}
+
+/* 4. Cards */
+.card {
+  background: var(--panel);
+  border-color: var(--line);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.15);
+}
+
+/* 5. Buttons recolor to pink/soft teal */
+.btn,
+.btn-wide {
+  background: var(--ios-blue);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(244, 114, 182, 0.35);
+}
+
+.btn:active,
+.btn-wide:active {
+  background: var(--ios-blue-d);
+  transform: translateY(1px);
+}
+
+.btn-ghost {
+  background: #e2f3ff;
+  color: var(--ios-ink);
+  border-color: #cbd5e1;
+}
+
+/* 6. Danger zone card in light style */
+.card.danger {
+  background: #fff7f7;
+  border-color: #fecaca;
+}
+
+.card.danger h2 {
+  color: #b91c1c;
+}
+
+.card.danger .muted {
+  color: #b45309;
+}
+
+/* 7. Bottom nav to match app */
+footer.gs-nav {
+  background: #ffffff;
+  border-top: 1px solid #d1e4ec;
+}
+
+.gs-nav__item {
+  color: #64748b;
+}
+
+.gs-nav__item[aria-current="page"] {
+  font-weight: 700;
+  color: #ff6fa9;
+}
+
+/* 8. Modal dialog in light theme */
+.dialog {
+  background: #ffffff;
+  color: var(--ink);
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.banner-error {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding-bottom: 24px; /* small extra space above the nav */
+}
+
     </style>
 </head>
 
-<body>
-    <main>
+<body class="gs-has-nav">
+  <main>
         <br>
-        <h1>Privacy Policy for 3-Sides</h1>
-        <p class="meta"><strong>Effective Date:</strong> September 11, 2025</p>
+        <h1>Three Sides Privacy Policy</h1>
+        <p class="meta"><strong>Effective Date:</strong> November 15, 2025</p>
 
         <p>
-            My name is <strong>Crystal Roberts</strong> (GlowCode Studio). I created <em>3-Sides</em> to help
+            My name is <strong>Crystal Roberts</strong> (GlowCode Studio). I created <em>Three Sides</em> to help
             people living with bipolar better understand and track their wellness in one place. While bipolar is often
-            described as “highs and lows,” I believe there is a third, essential side: <strong>stability</strong>. We
+            described as “<strong>highs</strong> and <strong>lows</strong>,” I believe there is a third, essential side: <strong>STABILITY</strong>. We
             all experience a range of emotions; we’re not always a “roller coaster.” This app supports balance,
             reflection, and awareness across highs, lows, and stable moments.
         </p>
 
         <h2>Scope</h2>
         <p>
-            This policy explains how 3-Sides handles information within the mobile/web app and on our website
+            This policy explains how Three Sides handles information within the mobile/web app and on our website
             hosted at
             <a href="https://cpriss1979.github.io/3Sides.io/" target="_blank"
                 rel="noopener">https://cpriss1979.github.io/3Sides.io/</a>.
@@ -123,7 +387,7 @@
 
         <h2>Information We Collect</h2>
         <p>
-            3-Sides does not collect your name, physical address, or precise location. To use certain features,
+           Three Sides does not collect your name, physical address, or precise location. To use certain features,
             you may create an account:
         </p>
         <ul>
@@ -134,8 +398,8 @@
             <li><strong>No login required:</strong> the Home page (<code>index.html</code>) and <em>Important
                     Numbers</em> (<code>important-numbers.html</code>) are accessible without sign-in. Emergency/support
                 numbers shown are for your convenience and are not tracked by us.</li>
-            <li><strong>User content:</strong> journal entries, mood/side selections (highs, lows, stability), toolkit
-                items, wellness plan details, pet progress, and theme selections. These may be stored locally on your
+            <li><strong>User content:</strong> mood/side selections (highs, lows, stability), feel-good tools,
+                journal entries, wellness plan, letter to future me, support people, pet, badges, and theme selections. These may be stored locally on your
                 device and, if you sign in, in your personal cloud data.</li>
         </ul>
 
@@ -168,7 +432,7 @@
                 toolkit items, wellness plan, pet progress, themes) when you are signed in. See the same Firebase policy
                 link above.</li>
             <li><strong>GitHub Pages:</strong> hosts our website and this policy at <a
-                    href="https://cpriss1979.github.io/3Sides.io/" target="_blank"
+                    href="https://github.com/cpriss1979/3Sides.io" target="_blank"
                     rel="noopener">cpriss1979.github.io/3Sides.io</a>.</li>
         </ul>
 
@@ -185,7 +449,7 @@
 
         <h2>Children’s Privacy</h2>
         <p>
-            3-Sides is intended for users aged <strong>18 and over</strong>. We do not knowingly collect
+            Three Sides is intended for users aged <strong>18 and over</strong>. We do not knowingly collect
             information from children. If you believe a minor has provided data, please contact us so we can delete it.
         </p>
 
@@ -217,9 +481,41 @@
             Publisher: GlowCode Studio (Crystal Roberts)
         </p>
     </main>
-    <div style="text-align: center;">
-        <a href="index.html" class="backToApp">Back to App</a>
-        </div>
-</body>
+    
+        <!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
+        <!-- Standard Bottom Nav (use on every page) -->
+        <footer class="gs-nav">
+            <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
+            <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
+            <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
+            <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
+            <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
+            <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
+                    class="ico">🎨</span><span>Settings</span></a>
+            </footer>
+            
+        <script>
+            /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
+            (function () {
+                // 1) Mark current tab active
+                const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+                document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
+                    const href = (a.getAttribute('href') || '').toLowerCase();
+                    if (href === here) a.setAttribute('aria-current', 'page');
+                });
+
+                // 2) Gate authed links (replace with your real auth check if needed)
+                const isAuthed = !!localStorage.getItem('currentUser');
+                document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
+                    if (isAuthed) return;
+                    a.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const dest = a.getAttribute('href') || 'index.html';
+                        location.href = `login.html?next=${encodeURIComponent(dest)}`;
+                    });
+                });
+            })();
+        </script>
+    </body>
 
 </html>

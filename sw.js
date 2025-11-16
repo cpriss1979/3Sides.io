@@ -25,10 +25,18 @@
         "about.html",
         "theme.html",
         "wellness.html",
+        "wellnessPlan.html",
         "pet.html",
         "important-numbers.html",
         "toolkit-hub.html",
         "login.html",
+        "journal.html",
+        "privacy.html",
+        "systemSettings.html",
+        "settings.html",
+        "permissions.html",
+        "letter.html",
+
 
         // Also linked from pet.html
         "journal.html",
@@ -38,6 +46,11 @@
         "mainTheme.css",
         "sw-register.js",
         "firebase-init.js",
+        "auth.js",
+        "badges.js",
+        "outbox.js",
+        "pet.page.js",
+        "script.js",
         // Add "auth.js" here only if it actually exists and is used
 
         // Images / icons

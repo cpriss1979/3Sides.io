@@ -7,6 +7,17 @@
     import './firebase-init.js'; // ensures app/auth/db are initialized
   </script>
 
+<!-- prefs bootstrap: put in <head> of every page -->
+<script>
+  (function () {
+    const PREFS_KEY = 'gs_prefs';
+    let p = {};
+    try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+    document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+    document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+  })();
+</script>
+  
   <!-- 1) First-boot guard: opacity (smoother) + disable all animations during boot -->
   <style>
     /* Hide only during the very first boot, never again */
@@ -36,7 +47,7 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Welcome to 3-Sides - HOME</title>
+  <title>Welcome to Three Sides - HOME</title>
   <meta name="description" content="Gentle, themeable planner for tracking mood, routines, and wellness.">
 
   <!-- PWA -->
@@ -73,7 +84,28 @@
     </style>
   </noscript>
 
-  <!-- Early Theme Boot (kept; minor hardening) -->
+  <!-- ================= sign out of others =========================== -->
+  <script type="module">
+    import { auth, db } from './firebase-init.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const LOCAL_MARK = 'gs_session_ack_ts';
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      const uref = doc(db, 'users', user.uid);
+      onSnapshot(uref, async (snap) => {
+        const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+        const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+        if (bump > seen) {
+          localStorage.setItem(LOCAL_MARK, String(bump));
+          try { await signOut(auth); } finally { location.replace('login.html'); }
+        }
+      });
+    });
+  </script>
+  
+  <!-- ====================== Early Theme Boot (kept; minor hardening) ===================== -->
   <script>
     (function () {
       try {
@@ -135,12 +167,6 @@
       color: var(--text-color) !important;
     }
 
-    /* Auth bar */
-    #authControls {
-      margin-bottom: 0;
-      padding-bottom: 0
-    }
-
     #authControls p {
       margin: 0;
       padding: 0
@@ -162,7 +188,7 @@
     }
 
     .auth-button:hover {
-      background: #983d9d
+      background:rgb(221, 151, 221)
     }
 
     #authControls button {
@@ -178,7 +204,8 @@
     }
 
     #authControls button:hover {
-      background: #983d9d
+      background:rgb(221, 151, 221)
+
     }
 
     .dropdown-section details p {
@@ -192,42 +219,85 @@
       }
     }
 
-    /* Image hero box */
-    .image-text-box {
-      background: rgb(3, 3, 82);
-      padding: 1.5rem 1rem;
-      margin: 2rem 0;
-      box-sizing: border-box;
-      border-top: 2px solid #000;
-      border-bottom: 2px solid #000;
-      width: 100%;
-      max-width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
 
-      /* 🛡️ flicker guards */
-      will-change: opacity, transform;
-      transform: translateZ(0);
-      /* promote to its own layer */
-      backface-visibility: hidden;
-      contain: layout paint style;
-      isolation: isolate;
-    }
 
-    .hero-image {
-      max-width: 100%;
-      height: auto;
-      border-radius: 10px;
 
-      /* 🛡️ flicker guards for image */
-      image-rendering: auto;
-      transform: translateZ(0);
-      backface-visibility: hidden;
-      contain: paint;
-    }
 
+
+
+
+/* ========================== behind image gradient ======================== */
+    /* ✨ Sparkling gradient speech bubble at the top of journal */
+.image-text-box {
+  position: relative;
+  font-family: 'Comic Neue', sans-serif;
+
+  /* soft teal-to-pink gradient using your colors */
+  background: linear-gradient(
+    135deg,
+    #3bb5b3 0%,
+    #5fd7cf 30%,
+    #ffc6e0 70%,
+    #fbe0f0 100%
+  );
+
+  padding: 1.25rem 1.4rem;
+  margin: 2rem auto 1.5rem;
+  max-width: 260px;
+  border-radius: 1.4rem;
+
+  /* glowing, dreamy edges */
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.7),
+    0 6px 18px rgba(0, 0, 0, 0.15),
+    0 0 22px rgba(255, 198, 224, 0.7);
+
+  text-align: center;
+  color: rgba(0, 0, 0, 0.694) !important; /* deep ink text */
+  border: 1.5px solid #3bb5b3;
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+/* soft inner highlight */
+.hero-image::before {
+  content: "";
+  position: absolute;
+  inset: 4px 6px;
+  border-radius: 1.2rem;
+  background: radial-gradient(
+    circle at 20% 0%,
+    rgba(255, 255, 255, 0.45),
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* tiny sparkle sheen sweeping across the bubble */
+.hero-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.0) 0%,
+    rgba(255, 255, 255, 0.42) 35%,
+    rgba(255, 255, 255, 0.0) 70%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  animation: bubble-sheen 4.5s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes bubble-sheen {
+  0%, 100% { transform: translateX(-20%); }
+  50%      { transform: translateX(20%); }
+}
+   
     /* <details> content can repaint on iOS — stabilize it */
     details,
     details>* {
@@ -261,6 +331,7 @@
       .image-text-box p {
         font-size: 1rem;
         line-height: 1.4;
+        color: rgb(9, 15, 86);
       }
     }
 
@@ -278,7 +349,6 @@
       min-height: 100vh;
       box-sizing: border-box;
       width: 100%;
-      padding-bottom: 4rem;
     }
 
     *,
@@ -334,7 +404,260 @@
         opacity: .18
       }
     }
-  </style>
+
+/* ========== GLOBAL BOTTOM NAV (identical on all pages) ========== */
+:root{
+  --nav-h: 64px;                 /* fixed bar height */
+  --nav-fs: 12px;                /* label font size */
+  --nav-icon-fs: 20px;           /* emoji/icon size */
+  --nav-bg: #fafafa;             /* bar background */
+  --nav-border: rgba(69,111,179,.25);
+  --nav-text: rgba(69,111,179,1);
+  --nav-text-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar */
+.page-wrapper{
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Bar container */
+.bottom-nav{
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: var(--nav-bg);
+  border-top: 1px solid var(--nav-border);
+  display: flex;
+  align-items: center;           /* vertical centering */
+  justify-content: space-around; /* even spacing */
+  padding: 0 env(safe-area-inset-left, 8px) 0 env(safe-area-inset-right, 8px);
+  z-index: 1000;
+  overflow: hidden;              /* prevent any wrap spill */
+}
+
+/* Each item = equal column */
+.bottom-nav .nav-icon{
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  text-decoration: none;
+  color: var(--nav-text);
+  line-height: 1;
+  padding: 0; margin: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+/* Fixed sizes so height never changes */
+.bottom-nav .nav-icon .ico{ font-size: var(--nav-icon-fs); display:block; }
+.bottom-nav .nav-icon span{ font-size: var(--nav-fs); display:block; }
+
+/* Active + hover */
+.bottom-nav .nav-icon[aria-current="page"]{
+  color: var(--nav-text-active);
+  font-weight: 700;
+}
+.bottom-nav .nav-icon:hover{ color:#72aadf; }
+
+/* Optional helpers for the “Back + Privacy” cluster just above the bar */
+.page-actions{
+  display:flex; flex-direction:column; align-items:center; gap:.5rem;
+  margin:.25rem 0 .5rem;
+}
+.legal-footer{ text-align:center; font-size:.9rem; margin:0; color:var(--text-color); }
+.legal-footer a{ color:inherit; text-decoration:underline; }
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
+
+.cloud-section {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0rem 2.2rem;
+  box-sizing: border-box;
+}
+/* --- Reserve space for the fixed Glow bottom nav (works for both class names) --- */
+:root{
+  --gs-nav-h: 64px;
+}
+
+html, body {
+  min-height: 100svh;           /* better on mobile address-bar */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Accept either class name (your body currently has has-bottom-nav) */
+body.gs-has-nav,
+body.has-bottom-nav {
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Your gs-nav footer already exists — keep your styles.
+   These two ensure it always stays on top and never clips content. */
+footer.gs-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  z-index: 1000;
+}
+
+/* Optional: give the main content a wrapper so the last element never sits flush */
+main.page {
+  display: block;
+  padding-bottom: 1rem; /* small cushion above the fixed bar */
+  box-sizing: border-box;
+}
+
+/* --- Logout button: Pink rgb(221,151,221) --- */
+#logoutBtn{
+  background: rgb(221, 151, 221) !important;
+  color: #000 !important;
+  border: 1px solid #000;
+  padding: .5rem 1.2rem;
+  border-radius: 1.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,.1);
+  cursor: pointer;
+  transition: background-color .2s ease, transform .1s ease;
+}
+#logoutBtn:hover,
+#logoutBtn:focus-visible{
+  background: rgb(221, 151, 221) !important; /* same hue for hover */
+  filter: brightness(.97);
+}
+#logoutBtn:active{ transform: translateY(1px); }
+
+
+/* --- Auth buttons: lock to Pink rgb(221,151,221) --- */
+.auth-buttons .auth-button,         /* "Log in" <a> */
+.auth-buttons #logoutBtn {          /* "Logout" <button> */
+  background: #3bb5b3 !important;
+  color: #000 !important;
+  border: .7px solid #000 !important;
+  padding: .5rem 1.2rem !important;
+  border-radius: .5rem !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,.1) !important;
+  display: inline-block !important;
+  cursor: pointer !important;
+  transition: filter .2s ease, transform .1s ease !important;
+}
+
+.auth-buttons .auth-button:hover,
+.auth-buttons .auth-button:focus-visible,
+.auth-buttons #logoutBtn:hover,
+.auth-buttons #logoutBtn:focus-visible {
+  filter: brightness(.97);
+}
+
+.auth-buttons #logoutBtn:active,
+.auth-buttons .auth-button:active {
+  transform: translateY(1px);
+}
+
+/* make the Privacy link visible + themed and keep it above nav */
+.legal-footer {
+  text-align: center;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 6.5rem !important; /* push it above the nav */
+  color: var(--text-color) !important;
+}
+.legal-footer a { color: inherit; text-decoration: underline; }
+
+/* ================ privacy link above fixed nav =================== */
+.legal-footer {
+  text-align:center;
+  font-size:.9rem;
+  margin: .5rem 0 6.5rem !important;
+  color: var(--text-color) !important;
+}
+.legal-footer a { color:inherit; text-decoration:underline; }
+
+.dropdown-section details p {
+  color: black !important
+}
+
+/* Make the bipolar FAQ pills almost full-width */
+.dropdown-section {
+  width: 100%;
+  max-width: 600px;        /* matches your main column */
+  margin: 0 auto;
+  padding: 0 .75rem;      /* tiny side padding so they don't hit the edge */
+  box-sizing: border-box;
+}
+
+.dropdown-section details {
+  margin: .55rem 0;
+}
+
+
+</style>
 
   <!-- Service worker registration -->
   <script src="./sw-register.js"></script>
@@ -352,20 +675,22 @@
           d.style.opacity = "1";
         }
       }
-    });
+    });    
   </script>
 </head>
 
-<body>
-    <!-- ============= page sparkles ============ -->
-    <div class="full-page-sparkle-wrapper" id="sparkleWrapper"></div>
-
-    <!-- 🔐 Auth bar rendered by script -->
-    <div id="authControls" class="auth-buttons"></div>
+<body class="gs-has-nav has-bottom-nav">
+  <div id="sparkleWrapper" class="full-page-sparkle-wrapper"></div>
+  <div id="authControls" class="auth-buttons"></div>
 
     <!-- 🌸 Redesigned Top Section -->
     <div class="page-header">
-        <h1 class="three-d-title">▀▄▀▄▀▄▀▄▀▄<br>３-ⓢ丨đｅ𝕤<br>▀▄▀▄▀▄▀▄▀▄</h1>
+        <h1 class="three-d-title">
+          ▀▄▀▄▀▄▀▄▀▄
+          <br>
+          <span style="color:#f584b7;">ⓉĤяＥᵉ Ⓢι∂έs</span><br>
+          ▀▄▀▄▀▄▀▄▀▄
+        </h1>
 
         <div class="image-text-box">
             <img src="relax.png" alt="Relaxing mental health image" class="hero-image">
@@ -374,14 +699,14 @@
                 When we or someone we love is living with bipolar disorder, it’s important to pause and ask: <em>What is
                     bipolar?</em>
             </p>
+</div>
 
-        </div>
-        <p
-            style="font-family: 'Open Sans', sans-serif; font-size: 1.4rem; font-weight: 600; color: var(--text-color); padding: 0 1.0rem;">
-            <strong>3-Sides</strong> represents the emotional shifts of bipolar life: the highs, the lows, and the
-            moments of
-            balance. This planner helps you make sense of it all, one day at a time.
-        </p>
+<p
+  style="font-family: 'Open Sans', sans-serif; font-size: 1.4rem; font-weight: 600; color: var(--text-color); padding: 0 1.0rem;">
+  <strong>3-Sides</strong> represents the emotional shifts of bipolar life: the highs, the lows, and the
+  moments of
+  balance. This planner helps you make sense of it all, one day at a time.
+</p>
 
         <div class="cloud-section intro-paragraph"></div>
 
@@ -523,16 +848,27 @@
                     cycles at a different rhythm.</p>
             </details>
         </div>
+ <br>
+ 
+<div class="legal-footer">
+  View our
+  <a href="privacy.html" rel="noopener">Privacy Policy</a>
+  and
+  <a href="terms.html" rel="noopener">Terms of Use</a>.
+</div>
 
-        <footer class="bottom-nav">
-          <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
-          <a href="toolkit-hub.html" class="nav-icon" data-auth="true">🧰<span>Toolkit</span></a>
-          <a href="wellness.html" class="nav-icon" data-auth="true">💖<span>Wellness</span></a>
-          <a href="pet.html" class="nav-icon" data-auth="true">🐾<span>Pet</span></a>
-          <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
-          <a href="theme.html" class="nav-icon" data-auth="true">🎨<span>Themes</span></a>
-        </footer>            
-
+        <!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
+        <!-- Standard Bottom Nav (use on every page) -->
+        <footer class="gs-nav">
+          <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
+          <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
+          <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
+          <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
+          <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
+          <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
+              class="ico">🎨</span><span>Settings</span></a>
+        </footer>
+        
         <!-- ====================== SCRIPT (drop-in) ====================== -->
         <script type="module">
           import { auth, db } from "./firebase-init.js";
@@ -678,5 +1014,30 @@
           // 🚫 DO NOT re-hide on pagehide — this causes the strobe on iOS
           // window.addEventListener("pagehide", () => { html.removeAttribute("data-ready"); });
         </script>
-        </body>
+       
+      <script>
+        /* Glow bottom nav: mark active tab + gate authed links */
+        (function () {
+          // mark current tab active (works with .gs-nav__item)
+          const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+          document.querySelectorAll('.gs-nav__item').forEach(a => {
+            const href = (a.getAttribute('href') || '').toLowerCase();
+            if (href === here) a.setAttribute('aria-current', 'page');
+          });
+
+          // gate links that require auth (uses your localStorage marker)
+          const isAuthed = !!localStorage.getItem('currentUser');
+          if (!isAuthed) {
+            document.querySelectorAll('.gs-nav__item[data-auth="true"]').forEach(a => {
+              a.addEventListener('click', (e) => {
+                e.preventDefault();
+                const dest = a.getAttribute('href') || 'index.html';
+                location.href = `login.html?next=${encodeURIComponent(dest)}`;
+              });
+            });
+          }
+        })();
+      </script>
+
+      </body>
 </html>

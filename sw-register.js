@@ -1,4 +1,4 @@
-// sw-register.js (calm iOS-safe version)
+// sw-register.js (calm iOS-safe version with reset helper, preserves original behavior)
 (() => {
     if (!("serviceWorker" in navigator)) return;
 
@@ -8,8 +8,26 @@
         return;
     }
 
+    // ---- Optional reset for testing: visit any page with ?sw=reset to unregister and clear caches ----
+    // Example: http://localhost:8080/index.html?sw=reset
+    if (new URL(location.href).searchParams.get("sw") === "reset") {
+        Promise.all([
+            navigator.serviceWorker.getRegistrations()
+                .then(regs => Promise.all(regs.map(r => r.unregister()))),
+            (async () => {
+                const keys = await caches.keys();
+                await Promise.all(keys.map(k => caches.delete(k)));
+            })()
+        ]).then(() => {
+            const url = new URL(location.href);
+            url.searchParams.delete("sw");   // remove the flag from the URL
+            location.replace(url.toString());
+        });
+        return; // skip registration on this run
+    }
+
     // Bump this whenever sw.js changes
-    const SW_VERSION = 34;
+    const SW_VERSION = 37; // ⬅️ bumped from 36
 
     // Compute the repo base robustly:
     // - On GitHub Pages project sites: always "/<repo>/"
@@ -24,14 +42,14 @@
         return new URL(".", location).pathname;
     }
 
-    const BASE = computeBase();            // e.g. "/three-sides.io/" or "./"
+    const BASE = computeBase();             // e.g. "/three-sides.io/" or "/"
     const SW_URL = `${BASE}sw.js?v=${SW_VERSION}`;
     const SCOPE = BASE;
 
     // Detect standalone modes
     const IS_STANDALONE =
         (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
-        // iOS Safari
+        // iOS Safari standalone
         (typeof navigator.standalone === "boolean" && navigator.standalone === true);
 
     // Simple debounce
@@ -103,7 +121,7 @@
                 console.log("[SW] Activating update quietly (no reload).");
                 waiting = null;
             } else {
-                // Defer activation: retry once things are stable/visible and NOT iOS standalone.
+                // Defer activation until visible & not iOS standalone
                 const onVisible = () => {
                     setTimeout(() => {
                         if (document.visibilityState === "visible" && !IS_STANDALONE && waiting) {
@@ -116,7 +134,7 @@
                 };
                 document.addEventListener("visibilitychange", onVisible);
 
-                // As a last resort, auto-activate after a gentle delay if not iOS standalone
+                // Failsafe activation after a gentle delay (no reload) when not iOS standalone
                 setTimeout(() => {
                     if (waiting && !IS_STANDALONE) {
                         waiting.postMessage({ type: "SKIP_WAITING" });

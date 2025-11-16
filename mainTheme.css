@@ -34,6 +34,20 @@
     --accent: var(--accent-color);
 }
 
+/* ---- Theme variable bridge (lets old --bg/--ink/--accent keep working) ---- */
+:root {
+    --bg: var(--bg-color, #ffffff);
+    --ink: var(--text-color, #111111);
+    --accent: var(--accent-color, #6a5acd);
+}
+
+/* Make sure theme-original actually defines the 3 main vars */
+.theme-original {
+    --bg-color: #eaf3ff;
+    --text-color: #257777;
+    --accent-color: #6095aa;
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-color) !important;
@@ -47,17 +61,16 @@ body {
 }
 
 /* ================== Core Themes (yours) ================== */
-
 .theme-original {
-    --bg-color: #ffffff;
-    --text-color: purple;
+    --bg-color: #eaf3ff;
+    --text-color: #3bb5b3;
     --accent-color: #6095aa;
 }
 
 /* Simple palettes you already had */
 .theme-blue {
     --bg-color: #aad7f6;
-    --text-color: #0d47a1;
+    --text-color: #6a98dd;
     --accent-color: #42a5f5;
 }
 

@@ -2,9 +2,29 @@
 <html lang="en">
 <head>
 
+  <script type="module">
+    import { auth, db } from './firebase-init.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const LOCAL_MARK = 'gs_session_ack_ts';
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return;
+      const uref = doc(db, 'users', user.uid);
+      onSnapshot(uref, async (snap) => {
+        const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+        const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+        if (bump > seen) {
+          localStorage.setItem(LOCAL_MARK, String(bump));
+          try { await signOut(auth); } finally { location.replace('login.html'); }
+        }
+      });
+    });
+  </script>
+  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3-Sides — IMPORTANT SUPPORT NUMBERS</title>
+  <title>Three Sides — IMPORTANT SUPPORT NUMBERS</title>
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
   <!-- Absolute (good for GitHub Pages) -->
   <link rel="manifest" href="manifest.webmanifest">
@@ -39,6 +59,17 @@
     })();
   </script>
     
+    <!-- prefs bootstrap: put in <head> of every page -->
+    <script>
+      (function () {
+        const PREFS_KEY = 'gs_prefs';
+        let p = {};
+        try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+        document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+        document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+      })();
+    </script>
+      
   <!-- Prevent flash of wrong theme -->
   <style>
     html {
@@ -280,7 +311,6 @@ body {
   overscroll-behavior-y: contain; /* or 'none' if needed */
 }
 
-
 html, body {
   margin: 0;
   padding: 0;
@@ -431,9 +461,12 @@ body {
 }
 
 .theme-arcade {
-    --bg-color: #2e0505;       /* dark arcade background */
-  --text-color: #c14242;     /* neon red-pink glow */
-  --accent-color: #ff3131;   /* bold joystick red */
+  --bg-color: #C8102E;
+    /* classic Santa Fe red */
+    --text-color: #FFE3E7;
+    /* soft light */
+    --accent-color: #6b0010;
+    /* deep maroon */
 }
 
 .theme-peach {
@@ -499,7 +532,7 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: rgb(3, 3, 82);
+  background-color: #3bb5b3;
   background-size: cover;
   display: flex;
   flex-direction: column;
@@ -544,8 +577,9 @@ li {
   font-size: 1.15rem !important;
   padding: 0.9rem 0.8rem !important; /* vertical padding reduced */
   margin: .3rem !important;  /* tighter space between items */
-  border: 4px solid green !important;
-  background-color: rgb(162, 242, 162) !important;
+  border: 1.7px solid #6c3763c6!important;
+  border-radius: 25px;
+  background-color: #ffff !important;
   line-height: 1.4; /* 💫 try 1.5–1.8 depending on what looks best */
 
 }
@@ -556,16 +590,20 @@ li {
   font-weight: bold;
   text-align: center;
   text-shadow: 2px 2px rgba(0, 0, 0, 0.2);
-  color: green !important;
+  color: rgb(16, 18, 16) !important;
     margin-top: 0.7rem !important;  /* <-- pull it tight to the top divider */
   margin-bottom: 0rem !important; /* <-- pull it tight to the bottom divider */
 }
 
 .footer-quote {
-  color: white; /* or #fefefe, or any color you want */
+  color: rgb(210, 27, 195); /* or #fefefe, or any color you want */
   text-align: center;
   font-size: 1.3rem;
   margin-top: 2rem;
+  background-color: rgb(215, 192, 236);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  border-top-right-radius: 25px;
+  border-bottom-left-radius: 25px;
 }
 
 /* --------------------- Mobile-safe media query -------------------- */
@@ -615,10 +653,10 @@ body {
 /* =============== overrides ================= */
 .torn-paper-divider {
   width: 100%;
-  height: 60px;
+  height: 40px;
   margin: 0 auto;
   display: block;
-  background: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 1440 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='rgb(162,242,162)' d='M0,40 Q80,90 160,40 T320,40 T480,40 T640,40 T800,40 T960,40 T1120,40 T1280,40 T1440,40 L1440,0 L0,0 Z'/%3E%3C/svg%3E") no-repeat center;
+  background: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 1440 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='rgb(255, 198, 224) ' d='M0,40 Q80,90 160,40 T320,40 T480,40 T640,40 T800,40 T960,40 T1120,40 T1280,40 T1440,40 L1440,0 L0,0 Z'/%3E%3C/svg%3E") no-repeat center;
   background-size: cover;
   transform: rotate(180deg);
 }
@@ -627,69 +665,201 @@ body {
   filter: none !important; 
 }
 
+/* ================= register css add ons ================ */
+/* ADDED: tiny legal footer style for the Privacy link */
+/* Privacy link at the bottom: make it match the accent */
+.legal-footer a { color: #C9BBFF !important; }              /* link color */
+.legal-footer a:hover { text-decoration: underline; filter: brightness(1.12); }
+  
+  .legal-footer {
+    color: black !important;
+    text-align: center;
+  }
+
+  .legal-footer a {
+    color: rgb(49, 64, 162) !important;
+  }
+
+/* ================= navbar overrides ============= */
+/* === Glow Standard Bottom Nav (namespaced) === */
+:root{
+  --gs-nav-h: 64px;
+  --gs-nav-fs: 12px;   /* label */
+  --gs-nav-ico: 20px;  /* emoji */
+  --gs-nav-bg: #fafafa;
+  --gs-nav-border: rgba(69,111,179,.25);
+  --gs-nav-text: rgba(69,111,179,1);
+  --gs-nav-active: #0b6cc4;
+}
+
+/* Reserve space for the fixed bar (opt-in via body.gs-has-nav) */
+body.gs-has-nav{
+  padding-bottom: calc(var(--gs-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The fixed bar */
+footer.gs-nav{
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--gs-nav-h);
+  background: var(--gs-nav-bg);
+  border-top: 1px solid var(--gs-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 env(safe-area-inset-left,8px) 0 env(safe-area-inset-right,8px);
+  z-index: 1000;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* normalize inheritance so pages can’t change it */
+  font-size: 0; line-height: 1; font-family: inherit;
+}
+
+/* Items are equal columns */
+.gs-nav__item{
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--gs-nav-text);
+  white-space: nowrap;
+  padding: 0; margin: 0;
+  box-sizing: border-box;
+}
+
+/* Explicit sizes (prevents page font from changing the bar) */
+.gs-nav__item .ico { font-size: var(--gs-nav-ico); display:block; line-height:1; }
+.gs-nav__item span { font-size: var(--gs-nav-fs); display:block; line-height:1; }
+
+/* Active + hover */
+.gs-nav__item[aria-current="page"]{ color: var(--gs-nav-active); font-weight: 700; }
+.gs-nav__item:hover{ color:#72aadf; }
 
   </style>
 </head>
 <body>
-<div class="torn-paper-divider" style="filter: brightness(0) invert(1); margin-bottom: 1rem;"></div>
 
   <div class="container">
     <div class="support-box">
     <h1 class="three-d-title">Important Support Numbers</h1>
-<div class="torn-paper-divider" style="filter: brightness(0) invert(1); margin-bottom: 1rem;"></div>
+<div class="torn-paper-divider" style="filter: brightness(0) invert(1); margin-bottom: 1.5rem;"></div>
 
-<ul><li>
-  <strong>🚨 Emergency Services:</strong>
-  <a href="tel:911">911</a>
-</li>
-
-<li>
-  <strong>📱 Suicide & Crisis Lifeline </strong>(24/7, confidential)
-  <a href="tel:988">988</a>
-</li>
-
-<li>
-  <strong>🧠 NAMI Helpline (M–F, 10 am–10 pm ET):</strong>
-  <a href="tel:1-800-950-6264">1-800-950-NAMI (6264)</a>
-</li>
-
-<li>
-  <strong>💬 Crisis Text Line:</strong>
-  <a href="sms:741741?body=HELLO">Text "HELLO" to 741741</a>
-</li>
-
-<li>
-  <strong>🏳️‍🌈 The Trevor Project (LGBTQ+ Support):</strong>
-  <a href="tel:1-866-488-7386">1-866-488-7386</a>
-</li>
-
-<li>
-  <strong>📞 SAMHSA National Helpline:</strong>
-  <a href="tel:1-800-662-4357">1-800-662-HELP (4357)</a>
-</li>
-
-<li>
-  <strong>👩‍⚕️ Veteran’s Crisis Line:</strong>
-  <a href="tel:1-800-273-8255">(Press 1) 1-800-273-TALK (8255)</a>
-</li>
-
-<li>
-  <strong>🌐 NAMI Online Resources:</strong>
-  <a href="https://www.nami.org/help" target="_blank">www.nami.org/help</a>
-</li>
+<!-- Crisis & emergency support -->
+<h3 class="support-heading">🚨 Crisis &amp; Emergency Support</h3>
+<ul class="support-list">
+  <li>
+    <strong>🚑 Emergency Services (Police / Fire / Ambulance)</strong>
+    <a href="tel:911">📞 911</a>
+  </li>
+  <li>
+    <strong>💗 Suicide &amp; Crisis Lifeline (24/7)</strong>
+    <a href="tel:988">📞 988</a>
+  </li>
+  <li>
+    <strong>💬 Crisis Text Line (24/7 text)</strong>
+    <a href="sms:741741?body=HOME">📱 Text "HOME" to 741741</a>
+  </li>
+  <li>
+    <strong>🎖 Veterans Crisis Line</strong>
+    <a href="tel:1-800-273-8255">📞 (Press 1) 1-800-273-TALK (8255)</a>
+  </li>
+  <li>
+    <strong>🌪 Disaster Distress Helpline</strong>
+    <a href="tel:1-800-985-5990">📞 1-800-985-5990</a>
+  </li>
 </ul>
+
+<!-- Mental health & substance support -->
+<h3 class="support-heading">💚 Mental Health &amp; Substance Support</h3>
+<ul class="support-list">
+  <li>
+    <strong>🧠 NAMI HelpLine (info &amp; support)</strong>
+    <a href="tel:1-800-950-6264">📞 1-800-950-NAMI (6264)</a>
+  </li>
+  <li>
+    <strong>📞 SAMHSA National Helpline</strong>
+    <a href="tel:1-800-662-4357">📞 1-800-662-HELP (4357)</a>
+  </li>
+  <li>
+    <strong>🤱 Postpartum Support International</strong>
+    <a href="tel:1-800-944-4773">📞 1-800-944-4773</a>
+  </li>
+  <li>
+    <strong>🎧 Teen Line (for teens)</strong>
+    <a href="tel:1-800-852-8336">📞 1-800-852-8336</a>
+  </li>
+  <li>
+    <strong>🏳️‍🌈 The Trevor Project (LGBTQ+ support)</strong>
+    <a href="tel:1-866-488-7386">📞 1-866-488-7386</a>
+  </li>
+</ul>
+
+<!-- Safety, abuse & violence -->
+<h3 class="support-heading">🛡️ Safety, Abuse &amp; Violence</h3>
+<ul class="support-list">
+  <li>
+    <strong>💜 National Domestic Violence Hotline</strong>
+    <a href="tel:1-800-799-7233">📞 1-800-799-SAFE (7233)</a>
+  </li>
+  <li>
+    <strong>💙 National Sexual Assault Hotline (RAINN)</strong>
+    <a href="tel:1-800-656-4673">📞 1-800-656-HOPE (4673)</a>
+  </li>
+  <li>
+    <strong>🧒 Childhelp National Child Abuse Hotline</strong>
+    <a href="tel:1-800-422-4453">📞 1-800-4-A-CHILD (422-4453)</a>
+  </li>
+  <li>
+    <strong>🏃 National Runaway Safeline</strong>
+    <a href="tel:1-800-786-2929">📞 1-800-RUNAWAY (786-2929)</a>
+  </li>
+</ul>
+
+<!-- Kids, teens & families -->
+<h3 class="support-heading">👨‍👩‍👧 Kids, Teens &amp; Families</h3>
+<ul class="support-list">
+  <li>
+    <strong>🧸 Missing &amp; Exploited Children (NCMEC)</strong>
+    <a href="tel:1-800-843-5678">📞 1-800-THE-LOST (843-5678)</a>
+  </li>
+</ul>
+
+<!-- Medical & poison emergencies -->
+<h3 class="support-heading">⚕️ Medical &amp; Poison Emergencies</h3>
+<ul class="support-list">
+  <li>
+    <strong>☠️ Poison Control</strong>
+    <a href="tel:1-800-222-1222">📞 1-800-222-1222</a>
+  </li>
+</ul>
+
+<div class="torn-paper-divider" style="filter: brightness(0) invert(1); margin-bottom: 1.5rem;"></div>
 
   </div>
 
   <footer class="footer-quote">💗 𝒴𝑜𝓊'𝓇𝑒 𝓃𝑜𝓉 𝒶𝓁𝑜𝓃𝑒. 𝐻𝑒𝓁𝓅 𝒾𝓈 𝒿𝓊𝓈𝓉 𝒶 𝒸𝒶𝓁𝓁 𝒶𝓌𝒶𝓎. 💗</footer>
 
-  <footer class="bottom-nav">
-    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
-    <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
-    <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
-    <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
-    <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
-    <a href="theme.html" class="nav-icon" data-auth="true">🎨<span>Themes</span></a>
+  <div class="legal-footer">
+    View our
+    <a href="privacy.html" rel="noopener">Privacy Policy</a>
+    and
+    <a href="terms.html" rel="noopener">Terms of Use</a>.
+  </div>
+
+  <!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
+  <!-- Standard Bottom Nav (use on every page) -->
+  <footer class="gs-nav">
+    <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
+    <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
+    <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
+    <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
+    <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
+    <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
+        class="ico">🎨</span><span>Settings</span></a>
   </footer>
   
   <script type="module">
@@ -828,6 +998,28 @@ body {
     });
   </script>
    
+   <script>
+    /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
+    (function () {
+      // 1) Mark current tab active
+      const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+      document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
+        const href = (a.getAttribute('href') || '').toLowerCase();
+        if (href === here) a.setAttribute('aria-current', 'page');
+      });
+
+      // 2) Gate authed links (replace with your real auth check if needed)
+      const isAuthed = !!localStorage.getItem('currentUser');
+      document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
+        if (isAuthed) return;
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          const dest = a.getAttribute('href') || 'index.html';
+          location.href = `login.html?next=${encodeURIComponent(dest)}`;
+        });
+      });
+    })();
+  </script>
   </body>
   
   </html>

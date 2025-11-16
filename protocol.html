@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>3-Sides — PROTOCOL</title>
+    <title>Three Sides — PROTOCOL</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     
     <!-- Favicons -->
@@ -15,6 +15,17 @@
     <!-- Absolute (good for GitHub Pages) -->
     <link rel="manifest" href="manifest.webmanifest">
     
+    <!-- prefs bootstrap: put in <head> of every page -->
+    <script>
+        (function () {
+            const PREFS_KEY = 'gs_prefs';
+            let p = {};
+            try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+            document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+            document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+        })();
+    </script>
+        
     <style>
         body {
             font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;

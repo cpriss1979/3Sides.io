@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>3-Sides — SHARE</title>
+    <title>Three Sides — SHARE</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
    
     <!-- Favicons -->
@@ -14,6 +14,37 @@
     
     <link rel="manifest" href="manifest.webmanifest">
 
+    <script type="module">
+        import { auth, db } from './firebase-init.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const LOCAL_MARK = 'gs_session_ack_ts';
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+            const uref = doc(db, 'users', user.uid);
+            onSnapshot(uref, async (snap) => {
+                const bump = snap?.data()?.sessionBumpedAt?.toMillis?.() || 0;
+                const seen = parseInt(localStorage.getItem(LOCAL_MARK) || '0', 10);
+                if (bump > seen) {
+                    localStorage.setItem(LOCAL_MARK, String(bump));
+                    try { await signOut(auth); } finally { location.replace('login.html'); }
+                }
+            });
+        });
+    </script>
+    
+    <!-- prefs bootstrap: put in <head> of every page -->
+    <script>
+        (function () {
+            const PREFS_KEY = 'gs_prefs';
+            let p = {};
+            try { p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { }
+            document.documentElement.style.setProperty('--motion-scale', p.reducedMotion ? '0' : '1');
+            document.documentElement.style.setProperty('--text-size', p.largerText ? '1.1rem' : '1rem');
+        })();
+    </script>
+        
    <style>
         body {
             font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
