@@ -67,15 +67,23 @@
       --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.22);
       --max-width: 430px;
     }
-
+  
     *,
     *::before,
     *::after {
       box-sizing: border-box;
     }
-
+  
+    /* NEW: lock horizontal width */
+    html,
     body {
       margin: 0;
+      padding: 0;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+  
+    body {
       min-height: 100vh;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #e5fbff 0, var(--page-bg) 50%, var(--page-bg-2) 100%);
@@ -84,7 +92,7 @@
       align-items: stretch;
       color: var(--text-main);
     }
-
+  
     .shell {
       width: 100%;
       max-width: var(--max-width);
@@ -93,7 +101,7 @@
       align-items: center;
       justify-content: center;
     }
-
+  
     .auth-card {
       width: 100%;
       background: var(--card-bg);
@@ -103,46 +111,46 @@
       display: flex;
       flex-direction: column;
     }
-
+  
     .auth-header {
       text-align: center;
       margin-bottom: 14px;
     }
-
+  
     .auth-title {
       margin: 0;
       font-size: 1.7rem;
       color: black;
     }
-
+  
     .auth-sub {
       margin: 4px 0 0;
       font-size: 0.9rem;
       color: var(--text-muted);
     }
-
+  
     .login-container {
       max-width: 360px;
       width: 100%;
       margin: 0 auto;
     }
-
+  
     form {
       margin: 14px 0 6px;
     }
-
+  
     .auth-group {
       margin-bottom: 0.75rem;
       text-align: left;
     }
-
+  
     .auth-label {
       display: block;
       font-size: 0.85rem;
       margin-bottom: 4px;
       color: var(--text-main);
     }
-
+  
     .auth-input {
       width: 100%;
       height: 44px;
@@ -152,27 +160,27 @@
       font-size: 0.95rem;
       outline: none;
     }
-
+  
     .auth-input::placeholder {
       color: rgba(0, 0, 0, 0.45);
       font-weight: 500;
     }
-
+  
     .auth-input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(255, 111, 169, 0.28);
     }
-
+  
     .password-row {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-
+  
     .password-row .auth-input {
       flex: 1 1 auto;
     }
-
+  
     .toggle-pass {
       border-radius: 999px;
       border: 1px solid #cbd5e1;
@@ -185,11 +193,11 @@
       line-height: 1;
       white-space: nowrap;
     }
-
+  
     .toggle-pass:active {
       transform: translateY(1px);
     }
-
+  
     .auth-button {
       width: 100%;
       border: none;
@@ -204,12 +212,12 @@
       transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
       box-shadow: 0 10px 22px rgba(244, 114, 182, 0.45);
     }
-
+  
     .auth-button:active {
       transform: translateY(1px);
       box-shadow: 0 5px 12px rgba(244, 114, 182, 0.35);
     }
-
+  
     #msg {
       margin: 0.6rem 0 0;
       padding: 0.55rem 0.7rem;
@@ -217,55 +225,55 @@
       font-size: 0.85rem;
       text-align: left;
     }
-
+  
     #msg:empty {
       margin: 0.25rem 0 0;
       padding: 0;
       border: none;
     }
-
+  
     .msg-error {
       background: #fee2e2;
       color: #b91c1c;
       border: 1px solid #fecaca;
     }
-
+  
     .msg-ok {
       background: #ecfeff;
       color: #155e75;
       border: 1px solid #a5f3fc;
     }
-
+  
     .auth-links {
       margin-top: 0.9rem;
       font-size: 0.9rem;
       color: var(--text-muted);
       text-align: center;
     }
-
+  
     .auth-links a {
       color: #9097de;
       font-weight: 700;
       text-decoration: none;
     }
-
+  
     .auth-links a:hover,
     .auth-links a:focus {
       color: #d39cff;
       text-decoration: underline;
     }
-
+  
     .forgot-row {
       margin-top: 0.45rem;
       font-size: 0.85rem;
       text-align: center;
     }
-
+  
     .forgot-row a {
       color: #007bff;
       text-decoration: underline;
     }
-
+  
     .card-footer {
       margin-top: 16px;
       padding-top: 12px;
@@ -274,7 +282,7 @@
       font-size: 0.8rem;
       color: #9ca3af;
     }
-
+  
     .backToApp {
       display: inline-block;
       margin-bottom: 4px;
@@ -282,31 +290,32 @@
       color: rgb(201, 108, 201);
       text-decoration: none;
     }
-
+  
     .backToApp:hover,
     .backToApp:focus {
       text-decoration: underline;
     }
-
+  
     .legal-footer {
       font-size: 0.8rem;
     }
-
+  
     .legal-footer a {
       color: #9097de;
       text-decoration: underline;
     }
-
+  
     @media (max-width: 600px) {
       .shell {
         padding: 16px 12px;
       }
-
+  
       .auth-card {
         border-radius: 20px;
       }
     }
   </style>
+  
 </head>
 
 <body>

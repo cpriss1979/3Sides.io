@@ -63,7 +63,7 @@ body {
 /* ================== Core Themes (yours) ================== */
 .theme-original {
     --bg-color: #eaf3ff;
-    --text-color: #3bb5b3;
+    --text-color: #111111c3;
     --accent-color: #6095aa;
 }
 
@@ -78,12 +78,6 @@ body {
     --bg-color: #b9dbbc;
     --text-color: #1b5e20;
     --accent-color: #3d4c3e;
-}
-
-.theme-pink {
-    --bg-color: #ebbad6;
-    --text-color: #880e4f;
-    --accent-color: #f06292;
 }
 
 .theme-purple {
@@ -132,14 +126,14 @@ body {
 
 /* Bingo Yellow */
 .theme-bingo {
-    --bg-color: #e6f640;
-    --text-color: #767931;
+    --bg-color: #eaff0890;
+    --text-color: #717412;
     --accent-color: #0a0a0a;
 }
 
 /* Bumblebee Yellow */
 .theme-bumblebee {
-    --bg-color: #d0c65d;
+    --bg-color: #d0ce5d;
     --text-color: #3e3e3e;
     --accent-color: #282722;
 }
@@ -295,7 +289,7 @@ body {
 .theme-colored-text {
     color: var(--text-color) !important;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
 }
 
 /* Headings: keep text themed; DO NOT force a background

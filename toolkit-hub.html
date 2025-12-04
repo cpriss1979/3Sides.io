@@ -169,26 +169,29 @@
 
     .toolkit-intro {
       text-align: center;
-      margin-top: -1rem;
-      margin-bottom: 2rem;
+      margin-top: 0rem;
+      margin-bottom: 0rem;
       color: var(--text-color);
+      font-size: 1.05rem;
+      padding-left: 4%;
+      padding-right:4%;
     }
-
     .button-purple {
-      display: inline-block;
-      padding: 10px 20px;
-      background-color: #ffc6e0;
-      color: black;
-      font-size: 1rem;
-      font-weight: bold;
-      border: 1px solid #d394b0;
-      border-radius: 8px;
-      text-decoration: none;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 255, 255, .2);
-      transition: background-color .3s, transform .2s;
-      text-align: center;
-    }
+  display: inline-block;
+  padding: 8px 18px;          /* was 10px 20px */
+  background-color: #ffc6e0;
+  color: black;
+  font-size: 0.95rem;         /* was 1rem */
+  font-weight: bold;
+  border: 1px solid #d394b0;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 255, 255, .2);
+  transition: background-color .3s, transform .2s;
+  text-align: center;
+}
+
 
     .button-purple:hover {
       background-color: #cd8fc3 !important;
@@ -196,8 +199,8 @@
     }
 
     .three-d-title {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 2.2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.7rem;
       font-weight: bold;
       text-align: center;
       text-shadow: 2px 2px rgba(0, 0, 0, .2);
@@ -537,6 +540,15 @@ a, .btn, .chip{
   accent-color: var(--accent);
 }
 
+/* ===== Accessibility: text size driven by --text-size ===== */
+html {
+  font-size: var(--text-size);
+}
+
+body {
+  font-size: 1rem;  /* keep body at 1rem relative to html */
+}
+
 </style>
 </head>
 
@@ -571,166 +583,136 @@ a, .btn, .chip{
       </div>
       
       <!-- ========== IDENTICAL NAV HTML (copy this exact block to every page) ========== -->
-      <!-- Standard Bottom Nav (use on every page) -->
       <footer class="gs-nav">
         <a href="index.html" class="gs-nav__item"><span class="ico">🏠</span><span>Home</span></a>
         <a href="toolkit-hub.html" class="gs-nav__item" data-auth="true"><span class="ico">🧰</span><span>Toolkit</span></a>
         <a href="wellness.html" class="gs-nav__item" data-auth="true"><span class="ico">💖</span><span>Wellness</span></a>
         <a href="pet.html" class="gs-nav__item" data-auth="true"><span class="ico">🐾</span><span>Pet</span></a>
         <a href="important-numbers.html" class="gs-nav__item"><span class="ico">🆘</span><span>Help</span></a>
-        <a href="systemSettings.html" class="gs-nav__item" data-auth="true"><span
-            class="ico">🎨</span><span>Settings</span></a>
+        <a href="systemSettings.html" class="gs-nav__item" data-auth="true">
+          <span class="ico">☸</span><span>Settings</span>
+        </a>
       </footer>
-    
-  <!-- Firebase-only -->
-  <script type="module">
-      import { auth, db } from "./firebase-init.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      
+      <!-- Firebase + theme + sparkles -->
+      <script type="module">
+        import { auth, db } from "./firebase-init.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const show = () => { document.documentElement.style.visibility = "visible"; };
-
-    function applyThemeClass(themeClass) {
-      const root = document.documentElement;
-      const next = themeClass || "theme-original";
-
-      // keep non-theme classes; swap only theme-*
-      const keep = (root.className || "")
-        .split(/\s+/).filter(Boolean)
-        .filter(c => !c.startsWith("theme-"));
-
-      const curr = (root.className.match(/\btheme-[^\s]+/g) || [])[0];
-      if (curr === next) return; // avoid reflow thrash
-
-      root.className = [...keep, next].join(" ");
-    }
-
-    // Optional: guard links marked with data-auth="true"
-    function guardLinks(isAuthed) {
-      document.querySelectorAll('[data-auth="true"]').forEach(a => {
-        if (isAuthed) { a.onclick = null; return; }
-        a.onclick = (e) => {
-          e.preventDefault();
-          const dest = a.getAttribute("href") || "index.html";
-          location.href = `login.html?next=${encodeURIComponent(dest)}`;
+        const show = () => {
+          document.documentElement.style.visibility = "";
+          document.documentElement.setAttribute("data-ready", "1");
         };
-      });
-    }
 
-    function createFullPageSparkles(count = 100) {
-      const container = document.getElementById('sparkleWrapper');
-      if (!container) return;
-      for (let i = 0; i < count; i++) {
-        const s = document.createElement('div');
-        s.className = 'sparkle';
-        s.style.top = `${Math.random() * 100}vh`;
-        s.style.left = `${Math.random() * 100}vw`;
-        s.style.animationDelay = `${Math.random() * 3}s`;
-        s.style.animationDuration = `${2 + Math.random() * 2.5}s`;
-        container.appendChild(s);
-      }
-    }
+        function applyThemeClass(themeClass) {
+          const root = document.documentElement;
+          const next = themeClass || "theme-original";
 
-    // Hard gate + fast theme load (same pattern as your working pages)
-    onAuthStateChanged(auth, (u) => {
-      if (!u) {
-        // Not logged in → send to login and come back here
-        location.replace("login.html?next=toolkit-hub.html");
-        return; // keep hidden
-      }
+          const keep = (root.className || "")
+            .split(/\s+/).filter(Boolean)
+            .filter(c => !c.startsWith("theme-"));
 
-      guardLinks(true);
+          const curr = (root.className.match(/\btheme-[^\s]+/g) || [])[0];
+          if (curr === next) return;
 
-      let first = true;
-      onSnapshot(
-        doc(db, "users", u.uid),
-        (snap) => {
-          const t = snap.exists() ? (snap.data().themeClass || "theme-original") : "theme-original";
-          applyThemeClass(t);
-          if (first) {
-            show();
-            createFullPageSparkles(100);
-            first = false;
-          }
-        },
-        (err) => {
-          console.error("[toolkit-hub] theme snapshot error:", err);
-          applyThemeClass("theme-original");
-          show();
-          createFullPageSparkles(100);
+          root.className = [...keep, next].join(" ");
         }
-      );
-    });
-  </script>
-  
-  <script>
-    (function () {
-      // 1) Mark the current page as active in the bottom nav
-      const here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
-      document.querySelectorAll(".bottom-nav .nav-icon").forEach(a => {
-        const href = (a.getAttribute("href") || "").toLowerCase();
-        if (href === here) a.setAttribute("aria-current", "page");
-      });
 
-      // 2) Optional auth guard: if you have a global isAuthed flag, use it; otherwise skip
-      const isAuthed = window.__isAuthed ?? null; // set this elsewhere if you want
-      if (isAuthed === false) {
-        document.querySelectorAll('.bottom-nav .nav-icon[data-auth="true"]').forEach(a => {
-          a.addEventListener('click', (e) => {
-            e.preventDefault();
-            const dest = a.getAttribute('href') || 'index.html';
-            location.href = 'login.html?next=' + encodeURIComponent(dest);
+        function guardLinks(isAuthed) {
+          document.querySelectorAll('[data-auth="true"]').forEach(a => {
+            if (isAuthed) {
+              a.onclick = null;
+              return;
+            }
+            a.onclick = (e) => {
+              e.preventDefault();
+              const dest = a.getAttribute("href") || "index.html";
+              location.href = `login.html?next=${encodeURIComponent(dest)}`;
+            };
           });
-        });
-      }
-    })();
-  </script>
-  
-  <script>
-    /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
-    (function () {
-      // 1) Mark current tab active
-      const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-      document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
-        const href = (a.getAttribute('href') || '').toLowerCase();
-        if (href === here) a.setAttribute('aria-current', 'page');
-      });
+        }
 
-      // 2) Gate authed links (replace with your real auth check if needed)
-      const isAuthed = !!localStorage.getItem('currentUser');
-      document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
-        if (isAuthed) return;
-        a.addEventListener('click', (e) => {
-          e.preventDefault();
-          const dest = a.getAttribute('href') || 'index.html';
-          location.href = `login.html?next=${encodeURIComponent(dest)}`;
-        });
-      });
-    })();
-  </script>
-    
-    <script>
-      /* ========== GLOBAL NAV SCRIPT (tiny, repeat on every page) ========== */
-      (function () {
-        // 1) Mark current tab active
-        const here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-        document.querySelectorAll('.bottom-nav .nav-icon').forEach(a => {
-          const href = (a.getAttribute('href') || '').toLowerCase();
-          if (href === here) a.setAttribute('aria-current', 'page');
-        });
+        // ✨ full-page sparkles, respecting reduced motion
+        function createFullPageSparkles(count = 100) {
+          const root = document.documentElement;
+          const motion = getComputedStyle(root)
+            .getPropertyValue("--motion-scale")
+            .trim();
 
-        // 2) Gate authed links (replace with your real auth check if needed)
-        const isAuthed = !!localStorage.getItem('currentUser');
-        document.querySelectorAll('.bottom-nav [data-auth="true"]').forEach(a => {
-          if (isAuthed) return;
-          a.addEventListener('click', (e) => {
-            e.preventDefault();
-            const dest = a.getAttribute('href') || 'index.html';
-            location.href = `login.html?next=${encodeURIComponent(dest)}`;
+          if (motion === "0" || motion === "0.0") return;
+
+          const container = document.getElementById("sparkleWrapper");
+          if (!container) return;
+
+          for (let i = 0; i < count; i++) {
+            const s = document.createElement("div");
+            s.className = "sparkle";
+            s.style.top = `${Math.random() * 100}vh`;
+            s.style.left = `${Math.random() * 100}vw`;
+            s.style.animationDelay = `${Math.random() * 3}s`;
+            s.style.animationDuration = `${2 + Math.random() * 2.5}s`;
+            container.appendChild(s);
+          }
+        }
+
+        onAuthStateChanged(auth, (u) => {
+          if (!u) {
+            location.replace("login.html?next=toolkit-hub.html");
+            return;
+          }
+
+          guardLinks(true);
+
+          let first = true;
+          onSnapshot(
+            doc(db, "users", u.uid),
+            (snap) => {
+              const t = snap.exists()
+                ? (snap.data().themeClass || "theme-original")
+                : "theme-original";
+
+              applyThemeClass(t);
+
+              if (first) {
+                show();
+                createFullPageSparkles(100);
+                first = false;
+              }
+            },
+            (err) => {
+              console.error("[toolkit-hub] theme snapshot error:", err);
+              applyThemeClass("theme-original");
+              show();
+              createFullPageSparkles(100);
+            }
+          );
+        });
+      </script>
+      
+      <!-- gs-nav: mark active tab + gate authed links -->
+      <script>
+        (function () {
+          const here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+
+          document.querySelectorAll(".gs-nav__item").forEach(a => {
+            const href = (a.getAttribute("href") || "").toLowerCase();
+            if (href === here) a.setAttribute("aria-current", "page");
           });
-        });
-      })();
-    </script>
-  </body>
-  
-  </html>
+
+          const isAuthed = !!localStorage.getItem("currentUser");
+          if (!isAuthed) {
+            document.querySelectorAll(".gs-nav__item[data-auth='true']").forEach(a => {
+              a.addEventListener("click", (e) => {
+                e.preventDefault();
+                const dest = a.getAttribute("href") || "index.html";
+                location.href = `login.html?next=${encodeURIComponent(dest)}`;
+              });
+            });
+          }
+        })();
+      </script>
+      </main>
+      </body>
+      
+      </html>

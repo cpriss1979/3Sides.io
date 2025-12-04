@@ -133,6 +133,9 @@
       text-align: center
     }
 
+    h1{
+      color: white;
+    }
     .sub {
       margin: 0 auto 6px;
       text-align: center;
@@ -184,18 +187,6 @@
       display: block;
       font-weight: 700;
       margin: 10px 0 6px
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      font-size: 16px;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      background: transparent;
-      color: var(--ink)
     }
 
     /* Buttons */
@@ -446,8 +437,6 @@
     }
 
 /* =========================== system settings color overrides =========== */
-/* =========================== system settings color overrides =========== */
-
 /* 1. Theme colors to match teal / pink app */
 :root {
   --bg: #c7f5f2;          /* soft teal background */
@@ -462,12 +451,28 @@
   --ios-ink: #134e4a;
 }
 
+:root {
+  --bg: #c7f5f2;          /* soft teal background */
+  --panel: #ffffff;       /* white cards */
+  --ink: #134e4a;         /* deep teal text */
+  --muted: #64748b;
+  --line: #d1e4ec;
+  --ios-blue: #ff6fa9;    /* pink primary button */
+  --ios-blue-d: #f0529c;
+  --ios-gray-fill: #f4fbff;
+  --ios-gray-border: #cbd5e1;
+  --ios-ink: #134e4a;
+}
+
+
 /* 2. Page background + text color */
 body {
-  background: radial-gradient(circle at top, #e5fbff 0, #c7f5f2 55%, #a7e7dd 100%);
   color: var(--ink);
 }
 
+body {
+  background: #0b1220;
+}
 /* 3. Header + main layout (also fixes bottom being cut off) */
 header {
   background: transparent;
@@ -552,8 +557,6 @@ footer.gs-nav {
   border-color: #fecaca;
 }
 
-
-
 /* Toggle switch – softened to match teal/pink theme */
 .switch {
   position: relative;
@@ -595,6 +598,29 @@ footer.gs-nav {
   transform: translateX(20px);
 }
 
+/* ===============Security form layout – keep password fields contained in the card========= */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  box-sizing: border-box;  /* 👈 this is the magic line */
+  font-size: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+
+a {
+   color: #9ec2ff
+        }
+
+.card {
+  background-color: #0f172a;
+  border: .01px solid rgb(89, 105, 149);
+  color: white;
+}
   </style>
 </head>
 
@@ -624,7 +650,7 @@ footer.gs-nav {
       <div class="item">
         <div>
           <div><strong>Display name</strong></div>
-          <div class="meta">Update the name shown across the app. Email is your sign-in and recovery address.</div>
+          <div class="meta">Update the name shown across the app.</div>
         </div>
         <button id="btnNameEmail" class="btn" type="button">Edit</button>
       </div>
@@ -653,7 +679,7 @@ footer.gs-nav {
 
       <form id="pwForm" novalidate>
         <input id="pwUser" type="email" name="username" autocomplete="username" tabindex="-1" aria-hidden="true"
-          style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;border:0;padding:0;margin:0" />
+        style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;border:0;padding:0;margin:0" />
 
         <label for="currentPw">Current password</label>
         <input id="currentPw" type="password" autocomplete="current-password" />
@@ -787,9 +813,6 @@ footer.gs-nav {
       <p class="muted">Permanently delete your account and all app data linked to it. This cannot be undone.</p>
       <div class="item" style="border-top:0">
         <div>
-          <div><strong>Delete account & data</strong></div>
-          <div class="meta">Requires confirmation and recent login.</div>
-        </div>
         <button id="btnDelete" class="btn-danger" type="button">Delete…</button>
       </div>
     </section>
@@ -870,7 +893,7 @@ footer.gs-nav {
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     // ---------- constants ----------
-    const APP_VERSION = '2.0.0';
+    const APP_VERSION = '1.0.9';
     const ANALYTICS_KEY = 'gs_analytics_enabled';
     const PREFS_KEY = 'gs_prefs'; // { reducedMotion: bool, largerText: bool }
     const SESSION_BUMP_FIELD = 'sessionBumpedAt';
