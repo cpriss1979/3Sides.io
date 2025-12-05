@@ -27,7 +27,7 @@
     }
 
     // Bump this whenever sw.js changes
-    const SW_VERSION = 38; // ⬅️ bumped from 37
+    const SW_VERSION = 39; // ⬅️ bumped from 38
 
     // Compute the repo base robustly:
     // - On GitHub Pages project sites: always "/<repo>/"
